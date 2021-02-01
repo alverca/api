@@ -12,12 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * リクエストプロジェクト設定ルーター
  */
-const ttts = require("@tokyotower/domain");
+const alverca = require("@alverca/domain");
 const express = require("express");
 const setProject = express.Router();
 // プロジェクト指定ルーティング配下については、req.projectをセット
 setProject.use('/projects/:id', (req, _, next) => __awaiter(void 0, void 0, void 0, function* () {
-    req.project = { typeOf: ttts.factory.chevre.organizationType.Project, id: req.params.id };
+    req.project = { typeOf: alverca.factory.chevre.organizationType.Project, id: req.params.id };
     next();
 }));
 exports.default = setProject;

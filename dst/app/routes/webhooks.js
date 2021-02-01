@@ -12,8 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * ウェブフックルーター
  */
+const alverca = require("@alverca/domain");
 const cinerinoapi = require("@cinerino/sdk");
-const ttts = require("@tokyotower/domain");
 const express = require("express");
 const mongoose = require("mongoose");
 const webhook_1 = require("../controllers/webhook");
@@ -27,8 +27,8 @@ webhooksRouter.post('/onReturnOrder', (req, res, next) => __awaiter(void 0, void
     try {
         const order = req.body.data;
         if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
-            const reportRepo = new ttts.repository.Report(mongoose.connection);
-            yield ttts.service.report.order.createRefundOrderReport({
+            const reportRepo = new alverca.repository.Report(mongoose.connection);
+            yield alverca.service.report.order.createRefundOrderReport({
                 order: order
             })({ report: reportRepo });
         }
@@ -45,18 +45,14 @@ webhooksRouter.post('/onReturnOrder', (req, res, next) => __awaiter(void 0, void
 webhooksRouter.post('/onOrderStatusChanged', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const order = req.body.data;
-        const reportRepo = new ttts.repository.Report(mongoose.connection);
-        const performanceRepo = new ttts.repository.Performance(mongoose.connection);
+        const reportRepo = new alverca.repository.Report(mongoose.connection);
         if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
             // 注文から売上レポート作成
-            yield ttts.service.report.order.createOrderReport({
+            yield alverca.service.report.order.createOrderReport({
                 order: order
             })({ report: reportRepo });
             switch (order.orderStatus) {
                 case cinerinoapi.factory.orderStatus.OrderReturned:
-                    yield webhook_1.onOrderReturned(order)({
-                        performance: performanceRepo
-                    });
                     break;
                 default:
             }
@@ -76,7 +72,7 @@ webhooksRouter.post('/onActionStatusChanged', (req, res, next) => __awaiter(void
         const action 
         // tslint:disable-next-line:max-line-length
         = req.body.data;
-        const reportRepo = new ttts.repository.Report(mongoose.connection);
+        const reportRepo = new alverca.repository.Report(mongoose.connection);
         if (typeof (action === null || action === void 0 ? void 0 : action.typeOf) === 'string') {
             yield webhook_1.onActionStatusChanged(action)({ report: reportRepo });
         }

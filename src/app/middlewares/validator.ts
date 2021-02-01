@@ -2,7 +2,7 @@
  * バリデーターミドルウェア
  * リクエストのパラメータ(query strings or body parameters)に対するバリデーション
  */
-import * as ttts from '@tokyotower/domain';
+import * as alverca from '@alverca/domain';
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { BAD_REQUEST } from 'http-status';
@@ -14,7 +14,7 @@ export default async (req: Request, __: Response, next: NextFunction) => {
     if (!validatorResult.isEmpty()) {
         const errors = validatorResult.array()
             .map((mappedRrror) => {
-                return new ttts.factory.errors.Argument(mappedRrror.param, mappedRrror.msg);
+                return new alverca.factory.errors.Argument(mappedRrror.param, mappedRrror.msg);
             });
 
         next(new APIError(BAD_REQUEST, errors));

@@ -1,7 +1,7 @@
 /**
  * リクエストプロジェクト設定ルーター
  */
-import * as ttts from '@tokyotower/domain';
+import * as alverca from '@alverca/domain';
 import * as express from 'express';
 
 const setProject = express.Router();
@@ -10,7 +10,7 @@ const setProject = express.Router();
 setProject.use(
     '/projects/:id',
     async (req, _, next) => {
-        req.project = { typeOf: ttts.factory.chevre.organizationType.Project, id: req.params.id };
+        req.project = { typeOf: alverca.factory.chevre.organizationType.Project, id: req.params.id };
 
         next();
     }

@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 売上レポートルーター
  */
-const ttts = require("@tokyotower/domain");
+const alverca = require("@alverca/domain");
 const createDebug = require("debug");
 const express_1 = require("express");
 const express_validator_1 = require("express-validator");
@@ -22,7 +22,7 @@ const moment = require("moment-timezone");
 const mongoose = require("mongoose");
 const permitScopes_1 = require("../middlewares/permitScopes");
 const validator_1 = require("../middlewares/validator");
-const debug = createDebug('ttts-api:router');
+const debug = createDebug('@alverca/api:router');
 // カラム区切り(タブ)
 const CSV_DELIMITER = '\t';
 // 改行コード(CR+LF)
@@ -74,7 +74,7 @@ aggregateSalesRouter.get('', permitScopes_1.default(['admin']), ...[
         // tslint:disable-next-line:no-magic-numbers
         const limit = (typeof req.query.limit === 'number') ? Math.min(req.query.limit, 100) : 100;
         const page = (typeof req.query.page === 'number') ? Math.max(req.query.page, 1) : 1;
-        const reportRepo = new ttts.repository.Report(mongoose.connection);
+        const reportRepo = new alverca.repository.Report(mongoose.connection);
         const andConditions = [
             { 'project.id': { $exists: true, $eq: (_a = req.project) === null || _a === void 0 ? void 0 : _a.id } }
         ];
@@ -131,7 +131,7 @@ aggregateSalesRouter.get('/stream', permitScopes_1.default(['admin']), ...[
 (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _b;
     try {
-        const reportRepo = new ttts.repository.Report(mongoose.connection);
+        const reportRepo = new alverca.repository.Report(mongoose.connection);
         debug('finding aggregateSales...', req.query);
         const andConditions = [
             { 'project.id': { $exists: true, $eq: (_b = req.project) === null || _b === void 0 ? void 0 : _b.id } }
@@ -184,7 +184,7 @@ aggregateSalesRouter.get('/stream', permitScopes_1.default(['admin']), ...[
                 ? String(doc.payment_seat_index)
                 : '';
             // 返品手数料の場合、値を調整
-            if (doc.category === ttts.factory.report.order.ReportCategory.CancellationFee) {
+            if (doc.category === alverca.factory.report.order.ReportCategory.CancellationFee) {
                 seatNumber = '';
                 ticketTypeName = '';
                 csvCode = '';

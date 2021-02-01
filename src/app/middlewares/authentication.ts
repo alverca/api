@@ -1,8 +1,8 @@
 /**
  * 認証ミドルウェア
  */
+import * as alverca from '@alverca/domain';
 import * as cinerinoapi from '@cinerino/sdk';
-import * as ttts from '@tokyotower/domain';
 
 import { cognitoAuth } from '@motionpicture/express-middleware';
 import { NextFunction, Request, Response } from 'express';
@@ -68,10 +68,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
                 next();
             },
             unauthorizedHandler: (err) => {
-                next(new ttts.factory.errors.Unauthorized(err.message));
+                next(new alverca.factory.errors.Unauthorized(err.message));
             }
         })(req, res, next);
     } catch (error) {
-        next(new ttts.factory.errors.Unauthorized(error.message));
+        next(new alverca.factory.errors.Unauthorized(error.message));
     }
 };

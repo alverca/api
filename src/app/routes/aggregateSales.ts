@@ -1,7 +1,7 @@
 /**
  * 売上レポートルーター
  */
-import * as ttts from '@tokyotower/domain';
+import * as alverca from '@alverca/domain';
 
 import * as createDebug from 'debug';
 import { Router } from 'express';
@@ -14,7 +14,7 @@ import * as mongoose from 'mongoose';
 import permitScopes from '../middlewares/permitScopes';
 import validator from '../middlewares/validator';
 
-const debug = createDebug('ttts-api:router');
+const debug = createDebug('@alverca/api:router');
 
 // カラム区切り(タブ)
 const CSV_DELIMITER: string = '\t';
@@ -74,7 +74,7 @@ aggregateSalesRouter.get(
             const limit = (typeof req.query.limit === 'number') ? Math.min(req.query.limit, 100) : 100;
             const page = (typeof req.query.page === 'number') ? Math.max(req.query.page, 1) : 1;
 
-            const reportRepo = new ttts.repository.Report(mongoose.connection);
+            const reportRepo = new alverca.repository.Report(mongoose.connection);
             const andConditions: any[] = [
                 { 'project.id': { $exists: true, $eq: req.project?.id } }
             ];
@@ -138,7 +138,7 @@ aggregateSalesRouter.get(
     // tslint:disable-next-line:max-func-body-length
     async (req, res, next) => {
         try {
-            const reportRepo = new ttts.repository.Report(mongoose.connection);
+            const reportRepo = new alverca.repository.Report(mongoose.connection);
             debug('finding aggregateSales...', req.query);
             const andConditions: any[] = [
                 { 'project.id': { $exists: true, $eq: req.project?.id } }
@@ -153,7 +153,7 @@ aggregateSalesRouter.get(
                 .cursor();
 
             // Mongoドキュメントをcsvデータに変換するtransformer
-            const transformer = (doc: ttts.factory.report.order.IReport) => {
+            const transformer = (doc: alverca.factory.report.order.IReport) => {
                 const eventDate = moment(doc.reservation.reservationFor.startDate)
                     .toDate();
                 const dateRecorded: string = // 万が一入塔予約日時より明らかに後であれば、間違ったデータなので調整
@@ -197,7 +197,7 @@ aggregateSalesRouter.get(
                     ? String(doc.payment_seat_index)
                     : '';
                 // 返品手数料の場合、値を調整
-                if (doc.category === ttts.factory.report.order.ReportCategory.CancellationFee) {
+                if (doc.category === alverca.factory.report.order.ReportCategory.CancellationFee) {
                     seatNumber = '';
                     ticketTypeName = '';
                     csvCode = '';
