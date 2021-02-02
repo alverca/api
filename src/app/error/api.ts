@@ -1,13 +1,13 @@
-import { factory } from '@tokyotower/domain';
+import { factory } from '@alverca/domain';
 
 /**
  * APIエラー
  */
 export class APIError extends Error {
     public readonly code: number;
-    public readonly errors: factory.errors.TTTS[];
+    public readonly errors: factory.errors.SmartTheater[];
 
-    constructor(code: number, errors: factory.errors.TTTS[]) {
+    constructor(code: number, errors: factory.errors.SmartTheater[]) {
         const message = errors.map((error) => error.message)
             .join('\n');
         super(message);

@@ -1,7 +1,7 @@
 /**
  * エラーハンドラーミドルウェア
  */
-import * as ttts from '@tokyotower/domain';
+import * as alverca from '@alverca/domain';
 import * as createDebug from 'debug';
 import { NextFunction, Request, Response } from 'express';
 import {
@@ -17,7 +17,7 @@ import {
 
 import { APIError } from '../error/api';
 
-const debug = createDebug('ttts-api:middlewares:errorHandler');
+const debug = createDebug('@alverca/api:middlewares:errorHandler');
 
 export default (err: any, __: Request, res: Response, next: NextFunction) => {
     debug('handling err...', err);
@@ -34,12 +34,13 @@ export default (err: any, __: Request, res: Response, next: NextFunction) => {
     } else {
         // エラー配列が入ってくることもある
         if (Array.isArray(err)) {
-            apiError = new APIError(tttsError2httpStatusCode(err[0]), err);
-        } else if (err instanceof ttts.factory.errors.TTTS) {
-            apiError = new APIError(tttsError2httpStatusCode(err), [err]);
+            apiError = new APIError(alvercaError2httpStatusCode(err[0]), err);
+        } else if (err instanceof alverca.factory.errors.SmartTheater) {
+            apiError = new APIError(alvercaError2httpStatusCode(err), [err]);
         } else {
             // 500
-            apiError = new APIError(INTERNAL_SERVER_ERROR, [new ttts.factory.errors.TTTS(<any>'InternalServerError', err.message)]);
+            apiError =
+                new APIError(INTERNAL_SERVER_ERROR, [new alverca.factory.errors.SmartTheater(<any>'InternalServerError', err.message)]);
         }
     }
 
@@ -50,46 +51,44 @@ export default (err: any, __: Request, res: Response, next: NextFunction) => {
 };
 
 /**
- * TTTSエラーをHTTPステータスコードへ変換する
- * @function
- * @param {ttts.factory.errors.TTTS} err TTTSエラー
+ * AlvercaエラーをHTTPステータスコードへ変換する
  */
-function tttsError2httpStatusCode(err: ttts.factory.errors.TTTS) {
+function alvercaError2httpStatusCode(err: alverca.factory.errors.SmartTheater) {
     let statusCode = BAD_REQUEST;
 
     switch (true) {
         // 401
-        case (err instanceof ttts.factory.errors.Unauthorized):
+        case (err instanceof alverca.factory.errors.Unauthorized):
             statusCode = UNAUTHORIZED;
             break;
 
         // 403
-        case (err instanceof ttts.factory.errors.Forbidden):
+        case (err instanceof alverca.factory.errors.Forbidden):
             statusCode = FORBIDDEN;
             break;
 
         // 404
-        case (err instanceof ttts.factory.errors.NotFound):
+        case (err instanceof alverca.factory.errors.NotFound):
             statusCode = NOT_FOUND;
             break;
 
         // 409
-        case (err instanceof ttts.factory.errors.AlreadyInUse):
+        case (err instanceof alverca.factory.errors.AlreadyInUse):
             statusCode = CONFLICT;
             break;
 
         // 429
-        case (err instanceof ttts.factory.errors.RateLimitExceeded):
+        case (err instanceof alverca.factory.errors.RateLimitExceeded):
             statusCode = TOO_MANY_REQUESTS;
             break;
 
         // 502
-        case (err instanceof ttts.factory.errors.NotImplemented):
+        case (err instanceof alverca.factory.errors.NotImplemented):
             statusCode = NOT_IMPLEMENTED;
             break;
 
         // 503
-        case (err instanceof ttts.factory.errors.ServiceUnavailable):
+        case (err instanceof alverca.factory.errors.ServiceUnavailable):
             statusCode = SERVICE_UNAVAILABLE;
             break;
 

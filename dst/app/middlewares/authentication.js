@@ -12,8 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 認証ミドルウェア
  */
+const alverca = require("@alverca/domain");
 const cinerinoapi = require("@cinerino/sdk");
-const ttts = require("@tokyotower/domain");
 const express_middleware_1 = require("@motionpicture/express-middleware");
 // 許可発行者リスト
 const ISSUERS = process.env.TOKEN_ISSUERS.split(',');
@@ -73,11 +73,11 @@ exports.default = (req, res, next) => __awaiter(void 0, void 0, void 0, function
                 next();
             }),
             unauthorizedHandler: (err) => {
-                next(new ttts.factory.errors.Unauthorized(err.message));
+                next(new alverca.factory.errors.Unauthorized(err.message));
             }
         })(req, res, next);
     }
     catch (error) {
-        next(new ttts.factory.errors.Unauthorized(error.message));
+        next(new alverca.factory.errors.Unauthorized(error.message));
     }
 });

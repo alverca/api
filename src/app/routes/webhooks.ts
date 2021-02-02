@@ -1,12 +1,12 @@
 /**
  * ウェブフックルーター
  */
+import * as alverca from '@alverca/domain';
 import * as cinerinoapi from '@cinerino/sdk';
-import * as ttts from '@tokyotower/domain';
 import * as express from 'express';
 import * as mongoose from 'mongoose';
 
-import { onActionStatusChanged, onOrderReturned } from '../controllers/webhook';
+import { onActionStatusChanged } from '../controllers/webhook';
 
 const webhooksRouter = express.Router();
 
@@ -23,9 +23,9 @@ webhooksRouter.post(
             const order = <cinerinoapi.factory.order.IOrder | undefined>req.body.data;
 
             if (typeof order?.orderNumber === 'string') {
-                const reportRepo = new ttts.repository.Report(mongoose.connection);
+                const reportRepo = new alverca.repository.Report(mongoose.connection);
 
-                await ttts.service.report.order.createRefundOrderReport({
+                await alverca.service.report.order.createRefundOrderReport({
                     order: order
                 })({ report: reportRepo });
             }
@@ -47,21 +47,16 @@ webhooksRouter.post(
         try {
             const order = <cinerinoapi.factory.order.IOrder>req.body.data;
 
-            const reportRepo = new ttts.repository.Report(mongoose.connection);
-            const performanceRepo = new ttts.repository.Performance(mongoose.connection);
+            const reportRepo = new alverca.repository.Report(mongoose.connection);
 
             if (typeof order?.orderNumber === 'string') {
                 // 注文から売上レポート作成
-                await ttts.service.report.order.createOrderReport({
+                await alverca.service.report.order.createOrderReport({
                     order: order
                 })({ report: reportRepo });
 
                 switch (order.orderStatus) {
                     case cinerinoapi.factory.orderStatus.OrderReturned:
-                        await onOrderReturned(order)({
-                            performance: performanceRepo
-                        });
-
                         break;
 
                     default:
@@ -85,10 +80,10 @@ webhooksRouter.post(
         try {
             const action
                 // tslint:disable-next-line:max-line-length
-                = <ttts.factory.chevre.action.IAction<ttts.factory.chevre.action.IAttributes<ttts.factory.chevre.actionType, any, any>> | undefined>
+                = <alverca.factory.chevre.action.IAction<alverca.factory.chevre.action.IAttributes<alverca.factory.chevre.actionType, any, any>> | undefined>
                 req.body.data;
 
-            const reportRepo = new ttts.repository.Report(mongoose.connection);
+            const reportRepo = new alverca.repository.Report(mongoose.connection);
 
             if (typeof action?.typeOf === 'string') {
                 await onActionStatusChanged(action)({ report: reportRepo });

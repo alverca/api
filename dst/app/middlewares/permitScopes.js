@@ -4,9 +4,9 @@ exports.isScopesPermitted = void 0;
 /**
  * スコープ許可ミドルウェア
  */
-const ttts = require("@tokyotower/domain");
+const alverca = require("@alverca/domain");
 const createDebug = require("debug");
-const debug = createDebug('ttts-api:middlewares:permitScopes');
+const debug = createDebug('@alverca/api:middlewares:permitScopes');
 exports.default = (permittedScopes) => {
     return (req, __, next) => {
         if (process.env.RESOURECE_SERVER_IDENTIFIER === undefined) {
@@ -25,7 +25,7 @@ exports.default = (permittedScopes) => {
         try {
             debug('checking scope requirements...', permittedScopesWithResourceServerIdentifier);
             if (!isScopesPermitted(req.user.scopes, permittedScopesWithResourceServerIdentifier)) {
-                next(new ttts.factory.errors.Forbidden('scope requirements not satisfied'));
+                next(new alverca.factory.errors.Forbidden('scope requirements not satisfied'));
             }
             else {
                 next();

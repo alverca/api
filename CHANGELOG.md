@@ -18,6 +18,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Security
 
+## v44.0.0 - 2021-02-02
+
+### Changed
+
+- @alverca/domainで再構築
+- update packages
+
+### Removed
+
+- パフォーマンスルーターを削除
+
 ## v43.1.1 - 2021-01-28
 
 ### Changed

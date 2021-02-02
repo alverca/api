@@ -1,5 +1,5 @@
+import * as alverca from '@alverca/domain';
 import * as middlewares from '@motionpicture/express-middleware';
-import * as ttts from '@tokyotower/domain';
 import { NextFunction, Request, Response } from 'express';
 
 import * as ioredis from 'ioredis';
@@ -19,8 +19,8 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     try {
         const routeIdentifier = `${req.baseUrl}${req.path}`;
         const rateLimitScope = (typeof req.project?.id === 'string')
-            ? `ttts-api:${req.project.id}:rateLimit:${routeIdentifier}:${req.method}`
-            : `ttts-api:rateLimit:${routeIdentifier}:${req.method}`;
+            ? `alverca-api:${req.project.id}:rateLimit:${routeIdentifier}:${req.method}`
+            : `alverca-api:rateLimit:${routeIdentifier}:${req.method}`;
 
         await middlewares.rateLimit({
             redisClient: redisClient,
@@ -30,7 +30,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
             limitExceededHandler: (_, __, resOnLimitExceeded, nextOnLimitExceeded) => {
                 resOnLimitExceeded.setHeader('Retry-After', UNIT_IN_SECONDS);
                 const message = `Retry after ${UNIT_IN_SECONDS} seconds`;
-                nextOnLimitExceeded(new ttts.factory.errors.RateLimitExceeded(message));
+                nextOnLimitExceeded(new alverca.factory.errors.RateLimitExceeded(message));
             },
             // スコープ生成ロジックをカスタマイズ
             scopeGenerator: () => rateLimitScope

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 404ハンドラーミドルウェア
  */
-const ttts = require("@tokyotower/domain");
+const alverca = require("@alverca/domain");
 exports.default = (req, __, next) => {
-    next(new ttts.factory.errors.NotFound(`router for [${req.originalUrl}]`));
+    next(new alverca.factory.errors.NotFound(`router for [${req.originalUrl}]`));
 };
