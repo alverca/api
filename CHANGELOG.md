@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Changed
 
 - @alverca/domainで再構築
+- update packages
 
 ### Deprecated
 

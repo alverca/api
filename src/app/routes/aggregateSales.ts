@@ -71,15 +71,16 @@ aggregateSalesRouter.get(
     async (req, res, next) => {
         try {
             // tslint:disable-next-line:no-magic-numbers
-            const limit = (typeof req.query.limit === 'number') ? Math.min(req.query.limit, 100) : 100;
-            const page = (typeof req.query.page === 'number') ? Math.max(req.query.page, 1) : 1;
+            const limit = (typeof req.query?.limit === 'number') ? Math.min(req.query.limit, 100) : 100;
+            const page = (typeof req.query?.page === 'number') ? Math.max(req.query.page, 1) : 1;
 
             const reportRepo = new alverca.repository.Report(mongoose.connection);
             const andConditions: any[] = [
                 { 'project.id': { $exists: true, $eq: req.project?.id } }
             ];
-            if (Array.isArray(req.query.$and)) {
-                andConditions.push(...req.query.$and);
+            const $and = req.query?.$and;
+            if (Array.isArray($and)) {
+                andConditions.push(...$and);
             }
             const reports = await reportRepo.aggregateSaleModel.find(
                 (Array.isArray(andConditions) && andConditions.length > 0) ? { $and: andConditions } : {}
@@ -143,8 +144,9 @@ aggregateSalesRouter.get(
             const andConditions: any[] = [
                 { 'project.id': { $exists: true, $eq: req.project?.id } }
             ];
-            if (Array.isArray(req.query.$and)) {
-                andConditions.push(...req.query.$and);
+            const $and = req.query?.$and;
+            if (Array.isArray($and)) {
+                andConditions.push(...$and);
             }
             const cursor = reportRepo.aggregateSaleModel.find(
                 (Array.isArray(andConditions) && andConditions.length > 0) ? { $and: andConditions } : {}
