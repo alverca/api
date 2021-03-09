@@ -97,4 +97,36 @@ webhooksRouter.post(
     }
 );
 
+/**
+ * 決済アクション受信
+ */
+webhooksRouter.post(
+    '/onPaymentStatusChanged',
+    async (req, res, next) => {
+        try {
+            const action
+                // tslint:disable-next-line:max-line-length
+                = <alverca.factory.chevre.action.IAction<alverca.factory.chevre.action.IAttributes<alverca.factory.chevre.actionType, any, any>> | undefined>
+                req.body.data;
+
+            const actionRepo = new alverca.repository.Action(mongoose.connection);
+
+            // とりあえずアクション保管
+            if (typeof action?.id === 'string' && typeof action?.typeOf === 'string') {
+                await actionRepo.actionModel.findByIdAndUpdate(
+                    action.id,
+                    { $setOnInsert: action },
+                    { upsert: true }
+                )
+                    .exec();
+            }
+
+            res.status(NO_CONTENT)
+                .end();
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
 export default webhooksRouter;
