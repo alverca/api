@@ -8,8 +8,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
-- 決済アクション受信エンドポイントを追加
-
 ### Changed
 
 ### Deprecated
@@ -19,6 +17,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Fixed
 
 ### Security
+
+## v44.2.0 - 2021-03-09
+
+### Added
+
+- 決済アクション受信エンドポイントを追加
 
 ## v44.1.0 - 2021-03-08
 
