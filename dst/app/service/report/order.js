@@ -335,7 +335,7 @@ function onReturnFeePaid(params) {
         if (typeof ((_c = params.object[0].paymentMethod.totalPaymentDue) === null || _c === void 0 ? void 0 : _c.value) === 'number') {
             amount = params.object[0].paymentMethod.totalPaymentDue.value;
         }
-        const sortBy = reservedReport.sortBy.replace(':00:', ':02');
+        const sortBy = reservedReport.sortBy.replace(':00:', ':02:');
         const dateRecorded = moment(params.startDate)
             .toDate();
         const report = Object.assign(Object.assign({}, reservedReport), { amount, category: alverca.factory.report.order.ReportCategory.CancellationFee, dateRecorded,

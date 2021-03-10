@@ -415,7 +415,7 @@ function onReturnFeePaid(params: alverca.factory.chevre.action.trade.pay.IAction
         if (typeof params.object[0].paymentMethod.totalPaymentDue?.value === 'number') {
             amount = params.object[0].paymentMethod.totalPaymentDue.value;
         }
-        const sortBy = reservedReport.sortBy.replace(':00:', ':02');
+        const sortBy = reservedReport.sortBy.replace(':00:', ':02:');
         const dateRecorded: Date = moment(params.startDate)
             .toDate();
         const report: alverca.factory.report.order.IReport = {
