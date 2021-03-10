@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
+- USE_PAY_RETURN_FEE_ACTION設定を追加
+
 ### Changed
 
 - 売上レポートサービスソースをdomainから移行

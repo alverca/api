@@ -9,6 +9,8 @@ import * as mongoose from 'mongoose';
 import { onActionStatusChanged } from '../controllers/webhook';
 import * as OrderReportService from '../service/report/order';
 
+const USE_PAY_RETURN_FEE_ACTION = process.env.USE_PAY_RETURN_FEE_ACTION === '1';
+
 const webhooksRouter = express.Router();
 
 import { NO_CONTENT } from 'http-status';
@@ -21,14 +23,16 @@ webhooksRouter.post(
     '/onReturnOrder',
     async (req, res, next) => {
         try {
-            const order = <cinerinoapi.factory.order.IOrder | undefined>req.body.data;
+            if (!USE_PAY_RETURN_FEE_ACTION) {
+                const order = <cinerinoapi.factory.order.IOrder | undefined>req.body.data;
 
-            if (typeof order?.orderNumber === 'string') {
-                const reportRepo = new alverca.repository.Report(mongoose.connection);
+                if (typeof order?.orderNumber === 'string') {
+                    const reportRepo = new alverca.repository.Report(mongoose.connection);
 
-                await OrderReportService.createRefundOrderReport({
-                    order: order
-                })({ report: reportRepo });
+                    await OrderReportService.createRefundOrderReport({
+                        order: order
+                    })({ report: reportRepo });
+                }
             }
 
             res.status(NO_CONTENT)
@@ -120,6 +124,12 @@ webhooksRouter.post(
                     { upsert: true }
                 )
                     .exec();
+
+                if (USE_PAY_RETURN_FEE_ACTION) {
+                    await OrderReportService.onPaymentStatusChanged(action)({
+                        report: new alverca.repository.Report(mongoose.connection)
+                    });
+                }
             }
 
             res.status(NO_CONTENT)

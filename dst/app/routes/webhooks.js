@@ -18,6 +18,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const webhook_1 = require("../controllers/webhook");
 const OrderReportService = require("../service/report/order");
+const USE_PAY_RETURN_FEE_ACTION = process.env.USE_PAY_RETURN_FEE_ACTION === '1';
 const webhooksRouter = express.Router();
 const http_status_1 = require("http-status");
 /**
@@ -26,12 +27,14 @@ const http_status_1 = require("http-status");
  */
 webhooksRouter.post('/onReturnOrder', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const order = req.body.data;
-        if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
-            const reportRepo = new alverca.repository.Report(mongoose.connection);
-            yield OrderReportService.createRefundOrderReport({
-                order: order
-            })({ report: reportRepo });
+        if (!USE_PAY_RETURN_FEE_ACTION) {
+            const order = req.body.data;
+            if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
+                const reportRepo = new alverca.repository.Report(mongoose.connection);
+                yield OrderReportService.createRefundOrderReport({
+                    order: order
+                })({ report: reportRepo });
+            }
         }
         res.status(http_status_1.NO_CONTENT)
             .end();
@@ -97,6 +100,11 @@ webhooksRouter.post('/onPaymentStatusChanged', (req, res, next) => __awaiter(voi
         if (typeof (action === null || action === void 0 ? void 0 : action.id) === 'string' && typeof (action === null || action === void 0 ? void 0 : action.typeOf) === 'string') {
             yield actionRepo.actionModel.findByIdAndUpdate(action.id, { $setOnInsert: action }, { upsert: true })
                 .exec();
+            if (USE_PAY_RETURN_FEE_ACTION) {
+                yield OrderReportService.onPaymentStatusChanged(action)({
+                    report: new alverca.repository.Report(mongoose.connection)
+                });
+            }
         }
         res.status(http_status_1.NO_CONTENT)
             .end();
