@@ -9,9 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onActionStatusChanged = void 0;
+exports.onActionStatusChanged = exports.onOrderStatusChanged = void 0;
 const alverca = require("@alverca/domain");
 const moment = require("moment-timezone");
+function onOrderStatusChanged(params) {
+    return (repos) => __awaiter(this, void 0, void 0, function* () {
+        // 注文を保管
+        yield repos.order.orderModel.findOneAndUpdate({ orderNumber: params.orderNumber }, { $setOnInsert: params }, { upsert: true })
+            .exec();
+    });
+}
+exports.onOrderStatusChanged = onOrderStatusChanged;
 /**
  * 予約使用アクション変更イベント処理
  */

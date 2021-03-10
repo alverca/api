@@ -6,8 +6,8 @@ import * as cinerinoapi from '@cinerino/sdk';
 import * as express from 'express';
 import * as mongoose from 'mongoose';
 
-import { onActionStatusChanged } from '../controllers/webhook';
 import * as OrderReportService from '../service/report/order';
+import { onActionStatusChanged, onOrderStatusChanged } from '../service/webhook';
 
 const USE_PAY_RETURN_FEE_ACTION = process.env.USE_PAY_RETURN_FEE_ACTION === '1';
 
@@ -52,9 +52,12 @@ webhooksRouter.post(
         try {
             const order = <cinerinoapi.factory.order.IOrder>req.body.data;
 
+            const orderRepo = new alverca.repository.Order(mongoose.connection);
             const reportRepo = new alverca.repository.Report(mongoose.connection);
 
             if (typeof order?.orderNumber === 'string') {
+                await onOrderStatusChanged(order)({ order: orderRepo });
+
                 // 注文から売上レポート作成
                 await OrderReportService.createOrderReport({
                     order: order

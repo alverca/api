@@ -1,5 +1,20 @@
 import * as alverca from '@alverca/domain';
+import * as cinerinoapi from '@cinerino/sdk';
 import * as moment from 'moment-timezone';
+
+export function onOrderStatusChanged(params: cinerinoapi.factory.order.IOrder) {
+    return async (repos: {
+        order: alverca.repository.Order;
+    }) => {
+        // 注文を保管
+        await repos.order.orderModel.findOneAndUpdate(
+            { orderNumber: params.orderNumber },
+            { $setOnInsert: params },
+            { upsert: true }
+        )
+            .exec();
+    };
+}
 
 /**
  * 予約使用アクション変更イベント処理
