@@ -7,6 +7,7 @@ import * as express from 'express';
 import * as mongoose from 'mongoose';
 
 import { onActionStatusChanged } from '../controllers/webhook';
+import * as OrderReportService from '../service/report/order';
 
 const webhooksRouter = express.Router();
 
@@ -25,7 +26,7 @@ webhooksRouter.post(
             if (typeof order?.orderNumber === 'string') {
                 const reportRepo = new alverca.repository.Report(mongoose.connection);
 
-                await alverca.service.report.order.createRefundOrderReport({
+                await OrderReportService.createRefundOrderReport({
                     order: order
                 })({ report: reportRepo });
             }
@@ -51,7 +52,7 @@ webhooksRouter.post(
 
             if (typeof order?.orderNumber === 'string') {
                 // 注文から売上レポート作成
-                await alverca.service.report.order.createOrderReport({
+                await OrderReportService.createOrderReport({
                     order: order
                 })({ report: reportRepo });
 

@@ -17,6 +17,7 @@ const cinerinoapi = require("@cinerino/sdk");
 const express = require("express");
 const mongoose = require("mongoose");
 const webhook_1 = require("../controllers/webhook");
+const OrderReportService = require("../service/report/order");
 const webhooksRouter = express.Router();
 const http_status_1 = require("http-status");
 /**
@@ -28,7 +29,7 @@ webhooksRouter.post('/onReturnOrder', (req, res, next) => __awaiter(void 0, void
         const order = req.body.data;
         if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
             const reportRepo = new alverca.repository.Report(mongoose.connection);
-            yield alverca.service.report.order.createRefundOrderReport({
+            yield OrderReportService.createRefundOrderReport({
                 order: order
             })({ report: reportRepo });
         }
@@ -48,7 +49,7 @@ webhooksRouter.post('/onOrderStatusChanged', (req, res, next) => __awaiter(void 
         const reportRepo = new alverca.repository.Report(mongoose.connection);
         if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
             // 注文から売上レポート作成
-            yield alverca.service.report.order.createOrderReport({
+            yield OrderReportService.createOrderReport({
                 order: order
             })({ report: reportRepo });
             switch (order.orderStatus) {
