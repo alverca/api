@@ -428,6 +428,8 @@ function onReturnFeePaid(params: alverca.factory.chevre.action.trade.pay.IAction
         if (typeof report.payment_seat_index === 'number') {
             delete report.payment_seat_index;
         }
+        delete (<any>report)._id;
+        delete (<any>report).id;
 
         await repos.report.saveReport(report);
     };

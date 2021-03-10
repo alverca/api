@@ -343,6 +343,8 @@ function onReturnFeePaid(params) {
         if (typeof report.payment_seat_index === 'number') {
             delete report.payment_seat_index;
         }
+        delete report._id;
+        delete report.id;
         yield repos.report.saveReport(report);
     });
 }
