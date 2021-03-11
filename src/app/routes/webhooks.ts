@@ -7,9 +7,9 @@ import * as express from 'express';
 import * as mongoose from 'mongoose';
 
 import * as OrderReportService from '../service/report/order';
-import { onActionStatusChanged, onOrderStatusChanged } from '../service/webhook';
+import { onActionStatusChanged, onOrderStatusChanged, onPaymentStatusChanged } from '../service/webhook';
 
-const USE_PAY_RETURN_FEE_ACTION = process.env.USE_PAY_RETURN_FEE_ACTION === '1';
+const USE_PAY_ORDER_ACTION = process.env.USE_PAY_ORDER_ACTION === '1';
 
 const webhooksRouter = express.Router();
 
@@ -21,19 +21,17 @@ import { NO_CONTENT } from 'http-status';
  */
 webhooksRouter.post(
     '/onReturnOrder',
-    async (req, res, next) => {
+    async (__, res, next) => {
         try {
-            if (!USE_PAY_RETURN_FEE_ACTION) {
-                const order = <cinerinoapi.factory.order.IOrder | undefined>req.body.data;
+            // const order = <cinerinoapi.factory.order.IOrder | undefined>req.body.data;
 
-                if (typeof order?.orderNumber === 'string') {
-                    const reportRepo = new alverca.repository.Report(mongoose.connection);
+            // if (typeof order?.orderNumber === 'string') {
+            //     const reportRepo = new alverca.repository.Report(mongoose.connection);
 
-                    await OrderReportService.createRefundOrderReport({
-                        order: order
-                    })({ report: reportRepo });
-                }
-            }
+            //     await OrderReportService.createRefundOrderReport({
+            //         order: order
+            //     })({ report: reportRepo });
+            // }
 
             res.status(NO_CONTENT)
                 .end();
@@ -58,13 +56,20 @@ webhooksRouter.post(
             if (typeof order?.orderNumber === 'string') {
                 await onOrderStatusChanged(order)({ order: orderRepo });
 
-                // 注文から売上レポート作成
-                await OrderReportService.createOrderReport({
-                    order: order
-                })({ report: reportRepo });
-
                 switch (order.orderStatus) {
+                    case cinerinoapi.factory.orderStatus.OrderProcessing:
+                        if (!USE_PAY_ORDER_ACTION) {
+                            // 注文から売上レポート作成
+                            await OrderReportService.createOrderReport({
+                                order: order
+                            })({ report: reportRepo });
+                        }
+                        break;
                     case cinerinoapi.factory.orderStatus.OrderReturned:
+                        // 注文から売上レポート作成
+                        await OrderReportService.createOrderReport({
+                            order: order
+                        })({ report: reportRepo });
                         break;
 
                     default:
@@ -118,9 +123,11 @@ webhooksRouter.post(
                 req.body.data;
 
             const actionRepo = new alverca.repository.Action(mongoose.connection);
+            const orderRepo = new alverca.repository.Order(mongoose.connection);
+            const reportRepo = new alverca.repository.Report(mongoose.connection);
 
-            // とりあえずアクション保管
             if (typeof action?.id === 'string' && typeof action?.typeOf === 'string') {
+                // とりあえずアクション保管
                 await actionRepo.actionModel.findByIdAndUpdate(
                     action.id,
                     { $setOnInsert: action },
@@ -128,11 +135,10 @@ webhooksRouter.post(
                 )
                     .exec();
 
-                if (USE_PAY_RETURN_FEE_ACTION) {
-                    await OrderReportService.onPaymentStatusChanged(action)({
-                        report: new alverca.repository.Report(mongoose.connection)
-                    });
-                }
+                await onPaymentStatusChanged(action)({
+                    order: orderRepo,
+                    report: reportRepo
+                });
             }
 
             res.status(NO_CONTENT)

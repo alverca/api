@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onPaymentStatusChanged = exports.createRefundOrderReport = exports.createOrderReport = exports.PriceSpecificationType = void 0;
+exports.createRefundOrderReport = exports.createOrderReport = exports.PriceSpecificationType = void 0;
 /**
  * 売上レポートサービス
  */
@@ -269,82 +269,4 @@ function customerGroup2reportString(params) {
         return '04';
     }
     return params.group;
-}
-/**
- * 決済ステータス変更イベント
- */
-function onPaymentStatusChanged(params) {
-    return (repos) => __awaiter(this, void 0, void 0, function* () {
-        switch (params.typeOf) {
-            case alverca.factory.chevre.actionType.PayAction:
-                yield onPaid(params)(repos);
-                break;
-            case alverca.factory.chevre.actionType.RefundAction:
-                yield onRefunded(params)(repos);
-                break;
-            default:
-            // no op
-        }
-    });
-}
-exports.onPaymentStatusChanged = onPaymentStatusChanged;
-function onPaid(params) {
-    return (repos) => __awaiter(this, void 0, void 0, function* () {
-        switch (params.purpose.typeOf) {
-            // 返品手数料決済であれば
-            case alverca.factory.chevre.actionType.ReturnAction:
-                yield onReturnFeePaid(params)(repos);
-                break;
-            // 注文決済であれば
-            case cinerinoapi.factory.order.OrderType.Order:
-                break;
-            default:
-        }
-    });
-}
-function onRefunded(__) {
-    return (___) => __awaiter(this, void 0, void 0, function* () {
-        // no op
-    });
-}
-function onReturnFeePaid(params) {
-    return (repos) => __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c;
-        const orderNumber = (_b = (_a = params.purpose) === null || _a === void 0 ? void 0 : _a.object) === null || _b === void 0 ? void 0 : _b.orderNumber;
-        if (typeof orderNumber !== 'string') {
-            throw new Error('params.purpose.object.orderNumber not string');
-        }
-        // 注文番号で注文決済行を取得
-        const reservedReport = yield repos.report.aggregateSaleModel.findOne({
-            category: alverca.factory.report.order.ReportCategory.Reserved,
-            'mainEntity.orderNumber': {
-                $exists: true,
-                $eq: orderNumber
-            }
-        })
-            .exec()
-            .then((doc) => {
-            if (doc === null) {
-                throw new Error('Reserved report not found');
-            }
-            return doc.toObject();
-        });
-        // 返品手数料行を作成
-        // category amount dateRecorded sortBy paymentSeatIndexを変更すればよい
-        let amount = 0;
-        if (typeof ((_c = params.object[0].paymentMethod.totalPaymentDue) === null || _c === void 0 ? void 0 : _c.value) === 'number') {
-            amount = params.object[0].paymentMethod.totalPaymentDue.value;
-        }
-        const sortBy = reservedReport.sortBy.replace(':00:', ':02:');
-        const dateRecorded = moment(params.startDate)
-            .toDate();
-        const report = Object.assign(Object.assign({}, reservedReport), { amount, category: alverca.factory.report.order.ReportCategory.CancellationFee, dateRecorded,
-            sortBy });
-        if (typeof report.payment_seat_index === 'number') {
-            delete report.payment_seat_index;
-        }
-        delete report._id;
-        delete report.id;
-        yield repos.report.saveReport(report);
-    });
 }

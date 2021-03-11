@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
-- USE_PAY_RETURN_FEE_ACTION設定を追加
+- USE_PAY_ORDER_ACTION設定を追加
 - 注文リポジトリを追加
 
 ### Changed

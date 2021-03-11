@@ -18,24 +18,22 @@ const express = require("express");
 const mongoose = require("mongoose");
 const OrderReportService = require("../service/report/order");
 const webhook_1 = require("../service/webhook");
-const USE_PAY_RETURN_FEE_ACTION = process.env.USE_PAY_RETURN_FEE_ACTION === '1';
+const USE_PAY_ORDER_ACTION = process.env.USE_PAY_ORDER_ACTION === '1';
 const webhooksRouter = express.Router();
 const http_status_1 = require("http-status");
 /**
  * 注文返金イベント
  * 購入者による手数料あり返品の場合に発生
  */
-webhooksRouter.post('/onReturnOrder', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+webhooksRouter.post('/onReturnOrder', (__, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!USE_PAY_RETURN_FEE_ACTION) {
-            const order = req.body.data;
-            if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
-                const reportRepo = new alverca.repository.Report(mongoose.connection);
-                yield OrderReportService.createRefundOrderReport({
-                    order: order
-                })({ report: reportRepo });
-            }
-        }
+        // const order = <cinerinoapi.factory.order.IOrder | undefined>req.body.data;
+        // if (typeof order?.orderNumber === 'string') {
+        //     const reportRepo = new alverca.repository.Report(mongoose.connection);
+        //     await OrderReportService.createRefundOrderReport({
+        //         order: order
+        //     })({ report: reportRepo });
+        // }
         res.status(http_status_1.NO_CONTENT)
             .end();
     }
@@ -53,12 +51,20 @@ webhooksRouter.post('/onOrderStatusChanged', (req, res, next) => __awaiter(void 
         const reportRepo = new alverca.repository.Report(mongoose.connection);
         if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
             yield webhook_1.onOrderStatusChanged(order)({ order: orderRepo });
-            // 注文から売上レポート作成
-            yield OrderReportService.createOrderReport({
-                order: order
-            })({ report: reportRepo });
             switch (order.orderStatus) {
+                case cinerinoapi.factory.orderStatus.OrderProcessing:
+                    if (!USE_PAY_ORDER_ACTION) {
+                        // 注文から売上レポート作成
+                        yield OrderReportService.createOrderReport({
+                            order: order
+                        })({ report: reportRepo });
+                    }
+                    break;
                 case cinerinoapi.factory.orderStatus.OrderReturned:
+                    // 注文から売上レポート作成
+                    yield OrderReportService.createOrderReport({
+                        order: order
+                    })({ report: reportRepo });
                     break;
                 default:
             }
@@ -98,15 +104,16 @@ webhooksRouter.post('/onPaymentStatusChanged', (req, res, next) => __awaiter(voi
         // tslint:disable-next-line:max-line-length
         = req.body.data;
         const actionRepo = new alverca.repository.Action(mongoose.connection);
-        // とりあえずアクション保管
+        const orderRepo = new alverca.repository.Order(mongoose.connection);
+        const reportRepo = new alverca.repository.Report(mongoose.connection);
         if (typeof (action === null || action === void 0 ? void 0 : action.id) === 'string' && typeof (action === null || action === void 0 ? void 0 : action.typeOf) === 'string') {
+            // とりあえずアクション保管
             yield actionRepo.actionModel.findByIdAndUpdate(action.id, { $setOnInsert: action }, { upsert: true })
                 .exec();
-            if (USE_PAY_RETURN_FEE_ACTION) {
-                yield OrderReportService.onPaymentStatusChanged(action)({
-                    report: new alverca.repository.Report(mongoose.connection)
-                });
-            }
+            yield webhook_1.onPaymentStatusChanged(action)({
+                order: orderRepo,
+                report: reportRepo
+            });
         }
         res.status(http_status_1.NO_CONTENT)
             .end();
