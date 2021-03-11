@@ -25,22 +25,24 @@ const http_status_1 = require("http-status");
  * 注文返金イベント
  * 購入者による手数料あり返品の場合に発生
  */
-webhooksRouter.post('/onReturnOrder', (__, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // const order = <cinerinoapi.factory.order.IOrder | undefined>req.body.data;
-        // if (typeof order?.orderNumber === 'string') {
-        //     const reportRepo = new alverca.repository.Report(mongoose.connection);
-        //     await OrderReportService.createRefundOrderReport({
-        //         order: order
-        //     })({ report: reportRepo });
-        // }
-        res.status(http_status_1.NO_CONTENT)
-            .end();
-    }
-    catch (error) {
-        next(error);
-    }
-}));
+// webhooksRouter.post(
+//     '/onReturnOrder',
+//     async (__, res, next) => {
+//         try {
+//             const order = <cinerinoapi.factory.order.IOrder | undefined>req.body.data;
+//             if (typeof order?.orderNumber === 'string') {
+//                 const reportRepo = new alverca.repository.Report(mongoose.connection);
+//                 await OrderReportService.createRefundOrderReport({
+//                     order: order
+//                 })({ report: reportRepo });
+//             }
+//             res.status(NO_CONTENT)
+//                 .end();
+//         } catch (error) {
+//             next(error);
+//         }
+//     }
+// );
 /**
  * 注文ステータス変更イベント
  */
@@ -53,18 +55,13 @@ webhooksRouter.post('/onOrderStatusChanged', (req, res, next) => __awaiter(void 
             yield webhook_1.onOrderStatusChanged(order)({ order: orderRepo });
             switch (order.orderStatus) {
                 case cinerinoapi.factory.orderStatus.OrderProcessing:
+                case cinerinoapi.factory.orderStatus.OrderReturned:
                     if (!USE_PAY_ORDER_ACTION) {
                         // 注文から売上レポート作成
                         yield OrderReportService.createOrderReport({
                             order: order
                         })({ report: reportRepo });
                     }
-                    break;
-                case cinerinoapi.factory.orderStatus.OrderReturned:
-                    // 注文から売上レポート作成
-                    yield OrderReportService.createOrderReport({
-                        order: order
-                    })({ report: reportRepo });
                     break;
                 default:
             }

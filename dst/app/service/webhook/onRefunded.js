@@ -10,11 +10,48 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.onRefunded = void 0;
-// import * as cinerinoapi from '@cinerino/sdk';
-// import * as moment from 'moment-timezone';
-function onRefunded(__) {
-    return (___) => __awaiter(this, void 0, void 0, function* () {
-        // no op
+/**
+ * 返金イベント受信サービス
+ */
+const alverca = require("@alverca/domain");
+const cinerinoapi = require("@cinerino/sdk");
+const moment = require("moment-timezone");
+const order_1 = require("../report/order");
+const USE_PAY_ORDER_ACTION = process.env.USE_PAY_ORDER_ACTION === '1';
+function onRefunded(params) {
+    return (repos) => __awaiter(this, void 0, void 0, function* () {
+        switch (params.purpose.typeOf) {
+            // 返品手数料決済であれば
+            case alverca.factory.chevre.actionType.ReturnAction:
+                if (USE_PAY_ORDER_ACTION) {
+                    yield onOrderRefunded(params)(repos);
+                }
+                break;
+            default:
+        }
     });
 }
 exports.onRefunded = onRefunded;
+function onOrderRefunded(params) {
+    return (repos) => __awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
+        // 注文を取得して、売上レポートに連携
+        const orderNumber = (_b = (_a = params.purpose) === null || _a === void 0 ? void 0 : _a.object) === null || _b === void 0 ? void 0 : _b.orderNumber;
+        if (typeof orderNumber !== 'string') {
+            throw new Error('params.purpose.orderNumber not string');
+        }
+        const order = yield repos.order.orderModel.findOne({ orderNumber })
+            .exec()
+            .then((doc) => {
+            if (doc === null) {
+                throw new Error('Order not found');
+            }
+            return doc.toObject();
+        });
+        // 注文から売上レポート作成
+        yield order_1.createOrderReport({
+            order: Object.assign(Object.assign({}, order), { orderStatus: cinerinoapi.factory.orderStatus.OrderReturned, dateReturned: moment(params.startDate)
+                    .toDate() })
+        })(repos);
+    });
+}

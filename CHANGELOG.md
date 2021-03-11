@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Changed
 
 - 売上レポートサービスソースをdomainから移行
+- 売上レポートを決済&返金アクションから作成するように変更
 
 ### Deprecated
 

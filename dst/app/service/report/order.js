@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createRefundOrderReport = exports.createOrderReport = exports.PriceSpecificationType = void 0;
+exports.createOrderReport = exports.PriceSpecificationType = void 0;
 /**
  * 売上レポートサービス
  */
@@ -76,8 +76,6 @@ function createOrderReport(params) {
                     });
                 });
                 break;
-            case cinerinoapi.factory.orderStatus.OrderDelivered:
-                break;
             case cinerinoapi.factory.orderStatus.OrderReturned:
                 datas = params.order.acceptedOffers
                     .filter((o) => o.itemOffered.typeOf === cinerinoapi.factory.chevre.reservationType.EventReservation)
@@ -106,38 +104,41 @@ exports.createOrderReport = createOrderReport;
 /**
  * 返金された注文からレポートを作成する
  */
-function createRefundOrderReport(params) {
-    return (repos) => __awaiter(this, void 0, void 0, function* () {
-        const datas = [];
-        const acceptedOffers = params.order.acceptedOffers
-            .filter((o) => o.itemOffered.typeOf === cinerinoapi.factory.chevre.reservationType.EventReservation);
-        if (acceptedOffers.length > 0) {
-            const acceptedOffer = acceptedOffers[0];
-            const unitPrice = getUnitPriceByAcceptedOffer(acceptedOffer);
-            datas.push(Object.assign({}, reservation2report({
-                category: alverca.factory.report.order.ReportCategory.CancellationFee,
-                r: acceptedOffer.itemOffered,
-                unitPrice: unitPrice,
-                order: params.order,
-                // 返品手数料行にはpayment_seat_indexなし
-                paymentSeatIndex: undefined,
-                salesDate: moment(params.order.dateReturned)
-                    .toDate()
-            })));
-        }
-        // 冪等性の確保!
-        yield Promise.all(datas.map((data) => __awaiter(this, void 0, void 0, function* () {
-            yield repos.report.saveReport(data);
-        })));
-    });
-}
-exports.createRefundOrderReport = createRefundOrderReport;
+// export function createRefundOrderReport(params: {
+//     order: cinerinoapi.factory.order.IOrder;
+// }) {
+//     return async (repos: { report: alverca.repository.Report }): Promise<void> => {
+//         const datas: alverca.factory.report.order.IReport[] = [];
+//         const acceptedOffers = params.order.acceptedOffers
+//             .filter((o) => o.itemOffered.typeOf === cinerinoapi.factory.chevre.reservationType.EventReservation);
+//         if (acceptedOffers.length > 0) {
+//             const acceptedOffer = acceptedOffers[0];
+//             const unitPrice = getUnitPriceByAcceptedOffer(acceptedOffer);
+//             datas.push({
+//                 ...reservation2report({
+//                     category: alverca.factory.report.order.ReportCategory.CancellationFee,
+//                     r: acceptedOffer.itemOffered,
+//                     unitPrice: unitPrice,
+//                     order: params.order,
+//                     // 返品手数料行にはpayment_seat_indexなし
+//                     paymentSeatIndex: undefined,
+//                     salesDate: moment(<Date>params.order.dateReturned)
+//                         .toDate()
+//                 })
+//             });
+//         }
+//         // 冪等性の確保!
+//         await Promise.all(datas.map(async (data) => {
+//             await repos.report.saveReport(data);
+//         }));
+//     };
+// }
 /**
  * 予約データをcsvデータ型に変換する
  */
 // tslint:disable-next-line:cyclomatic-complexity max-func-body-length
 function reservation2report(params) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+    var _a, _b, _c, _d, _e, _f, _g;
     const order = params.order;
     const age = (typeof order.customer.age === 'string') ? order.customer.age : '';
     let username = '';
@@ -165,7 +166,7 @@ function reservation2report(params) {
     const gender = (typeof order.customer.gender === 'string') ? order.customer.gender : '';
     const customerSegment = (locale !== '' ? locale : '__') + (age !== '' ? age : '__') + (gender !== '' ? gender : '_');
     const customerGroup = order2customerGroup(order);
-    let amount = Number(order.price);
+    const amount = Number(order.price);
     const customer = {
         group: customerGroup2reportString({ group: customerGroup }),
         givenName: (typeof order.customer.givenName === 'string') ? order.customer.givenName : '',
@@ -221,18 +222,18 @@ function reservation2report(params) {
     }
     let sortBy;
     switch (params.category) {
-        case alverca.factory.report.order.ReportCategory.CancellationFee:
-            let cancellationFee = 0;
-            const returnerIdentifier = (_h = params.order.returner) === null || _h === void 0 ? void 0 : _h.identifier;
-            if (Array.isArray(returnerIdentifier)) {
-                const cancellationFeeValue = (_j = returnerIdentifier.find((p) => p.name === 'cancellationFee')) === null || _j === void 0 ? void 0 : _j.value;
-                if (cancellationFeeValue !== undefined) {
-                    cancellationFee = Number(cancellationFeeValue);
-                }
-            }
-            amount = cancellationFee;
-            sortBy = getSortBy(params.order, params.r, '02');
-            break;
+        // case alverca.factory.report.order.ReportCategory.CancellationFee:
+        //     let cancellationFee = 0;
+        //     const returnerIdentifier = params.order.returner?.identifier;
+        //     if (Array.isArray(returnerIdentifier)) {
+        //         const cancellationFeeValue = returnerIdentifier.find((p) => p.name === 'cancellationFee')?.value;
+        //         if (cancellationFeeValue !== undefined) {
+        //             cancellationFee = Number(cancellationFeeValue);
+        //         }
+        //     }
+        //     amount = cancellationFee;
+        //     sortBy = getSortBy(params.order, params.r, '02');
+        //     break;
         case alverca.factory.report.order.ReportCategory.Cancelled:
             sortBy = getSortBy(params.order, params.r, '01');
             break;
