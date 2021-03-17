@@ -17,7 +17,6 @@ const alverca = require("@alverca/domain");
 const cinerinoapi = require("@cinerino/sdk");
 const moment = require("moment-timezone");
 const order_1 = require("../report/order");
-const USE_PAY_ORDER_ACTION = process.env.USE_PAY_ORDER_ACTION === '1';
 function onPaid(params) {
     return (repos) => __awaiter(this, void 0, void 0, function* () {
         switch (params.purpose.typeOf) {
@@ -27,9 +26,7 @@ function onPaid(params) {
                 break;
             // 注文決済であれば
             case cinerinoapi.factory.order.OrderType.Order:
-                if (USE_PAY_ORDER_ACTION) {
-                    yield onOrderPaid(params)(repos);
-                }
+                yield onOrderPaid(params)(repos);
                 break;
             default:
         }

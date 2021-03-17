@@ -7,8 +7,6 @@ import * as moment from 'moment-timezone';
 
 import { createOrderReport } from '../report/order';
 
-const USE_PAY_ORDER_ACTION = process.env.USE_PAY_ORDER_ACTION === '1';
-
 export function onRefunded(params: alverca.factory.chevre.action.trade.refund.IAction) {
     return async (repos: {
         order: alverca.repository.Order;
@@ -17,9 +15,7 @@ export function onRefunded(params: alverca.factory.chevre.action.trade.refund.IA
         switch (params.purpose.typeOf) {
             // 返品手数料決済であれば
             case alverca.factory.chevre.actionType.ReturnAction:
-                if (USE_PAY_ORDER_ACTION) {
-                    await onOrderRefunded(params)(repos);
-                }
+                await onOrderRefunded(params)(repos);
                 break;
 
             default:

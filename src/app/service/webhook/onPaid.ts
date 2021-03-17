@@ -7,8 +7,6 @@ import * as moment from 'moment-timezone';
 
 import { createOrderReport } from '../report/order';
 
-const USE_PAY_ORDER_ACTION = process.env.USE_PAY_ORDER_ACTION === '1';
-
 export function onPaid(params: alverca.factory.chevre.action.trade.pay.IAction) {
     return async (repos: {
         order: alverca.repository.Order;
@@ -22,9 +20,7 @@ export function onPaid(params: alverca.factory.chevre.action.trade.pay.IAction) 
 
             // 注文決済であれば
             case cinerinoapi.factory.order.OrderType.Order:
-                if (USE_PAY_ORDER_ACTION) {
-                    await onOrderPaid(params)(repos);
-                }
+                await onOrderPaid(params)(repos);
                 break;
 
             default:

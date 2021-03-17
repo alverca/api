@@ -17,15 +17,12 @@ const alverca = require("@alverca/domain");
 const cinerinoapi = require("@cinerino/sdk");
 const moment = require("moment-timezone");
 const order_1 = require("../report/order");
-const USE_PAY_ORDER_ACTION = process.env.USE_PAY_ORDER_ACTION === '1';
 function onRefunded(params) {
     return (repos) => __awaiter(this, void 0, void 0, function* () {
         switch (params.purpose.typeOf) {
             // 返品手数料決済であれば
             case alverca.factory.chevre.actionType.ReturnAction:
-                if (USE_PAY_ORDER_ACTION) {
-                    yield onOrderRefunded(params)(repos);
-                }
+                yield onOrderRefunded(params)(repos);
                 break;
             default:
         }

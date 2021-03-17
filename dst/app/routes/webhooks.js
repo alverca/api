@@ -13,36 +13,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * ウェブフックルーター
  */
 const alverca = require("@alverca/domain");
-const cinerinoapi = require("@cinerino/sdk");
 const express = require("express");
 const mongoose = require("mongoose");
-const OrderReportService = require("../service/report/order");
 const webhook_1 = require("../service/webhook");
-const USE_PAY_ORDER_ACTION = process.env.USE_PAY_ORDER_ACTION === '1';
 const webhooksRouter = express.Router();
 const http_status_1 = require("http-status");
-/**
- * 注文返金イベント
- * 購入者による手数料あり返品の場合に発生
- */
-// webhooksRouter.post(
-//     '/onReturnOrder',
-//     async (__, res, next) => {
-//         try {
-//             const order = <cinerinoapi.factory.order.IOrder | undefined>req.body.data;
-//             if (typeof order?.orderNumber === 'string') {
-//                 const reportRepo = new alverca.repository.Report(mongoose.connection);
-//                 await OrderReportService.createRefundOrderReport({
-//                     order: order
-//                 })({ report: reportRepo });
-//             }
-//             res.status(NO_CONTENT)
-//                 .end();
-//         } catch (error) {
-//             next(error);
-//         }
-//     }
-// );
 /**
  * 注文ステータス変更イベント
  */
@@ -50,21 +25,8 @@ webhooksRouter.post('/onOrderStatusChanged', (req, res, next) => __awaiter(void 
     try {
         const order = req.body.data;
         const orderRepo = new alverca.repository.Order(mongoose.connection);
-        const reportRepo = new alverca.repository.Report(mongoose.connection);
         if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
             yield webhook_1.onOrderStatusChanged(order)({ order: orderRepo });
-            switch (order.orderStatus) {
-                case cinerinoapi.factory.orderStatus.OrderProcessing:
-                case cinerinoapi.factory.orderStatus.OrderReturned:
-                    if (!USE_PAY_ORDER_ACTION) {
-                        // 注文から売上レポート作成
-                        yield OrderReportService.createOrderReport({
-                            order: order
-                        })({ report: reportRepo });
-                    }
-                    break;
-                default:
-            }
         }
         res.status(http_status_1.NO_CONTENT)
             .end();
