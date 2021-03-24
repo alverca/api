@@ -13,49 +13,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * ウェブフックルーター
  */
 const alverca = require("@alverca/domain");
-const cinerinoapi = require("@cinerino/sdk");
 const express = require("express");
 const mongoose = require("mongoose");
-const webhook_1 = require("../controllers/webhook");
+const webhook_1 = require("../service/webhook");
 const webhooksRouter = express.Router();
 const http_status_1 = require("http-status");
-/**
- * 注文返金イベント
- * 購入者による手数料あり返品の場合に発生
- */
-webhooksRouter.post('/onReturnOrder', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const order = req.body.data;
-        if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
-            const reportRepo = new alverca.repository.Report(mongoose.connection);
-            yield alverca.service.report.order.createRefundOrderReport({
-                order: order
-            })({ report: reportRepo });
-        }
-        res.status(http_status_1.NO_CONTENT)
-            .end();
-    }
-    catch (error) {
-        next(error);
-    }
-}));
 /**
  * 注文ステータス変更イベント
  */
 webhooksRouter.post('/onOrderStatusChanged', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const order = req.body.data;
-        const reportRepo = new alverca.repository.Report(mongoose.connection);
+        const orderRepo = new alverca.repository.Order(mongoose.connection);
         if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
-            // 注文から売上レポート作成
-            yield alverca.service.report.order.createOrderReport({
-                order: order
-            })({ report: reportRepo });
-            switch (order.orderStatus) {
-                case cinerinoapi.factory.orderStatus.OrderReturned:
-                    break;
-                default:
-            }
+            yield webhook_1.onOrderStatusChanged(order)({ order: orderRepo });
         }
         res.status(http_status_1.NO_CONTENT)
             .end();
@@ -92,10 +63,16 @@ webhooksRouter.post('/onPaymentStatusChanged', (req, res, next) => __awaiter(voi
         // tslint:disable-next-line:max-line-length
         = req.body.data;
         const actionRepo = new alverca.repository.Action(mongoose.connection);
-        // とりあえずアクション保管
+        const orderRepo = new alverca.repository.Order(mongoose.connection);
+        const reportRepo = new alverca.repository.Report(mongoose.connection);
         if (typeof (action === null || action === void 0 ? void 0 : action.id) === 'string' && typeof (action === null || action === void 0 ? void 0 : action.typeOf) === 'string') {
+            // とりあえずアクション保管
             yield actionRepo.actionModel.findByIdAndUpdate(action.id, { $setOnInsert: action }, { upsert: true })
                 .exec();
+            yield webhook_1.onPaymentStatusChanged(action)({
+                order: orderRepo,
+                report: reportRepo
+            });
         }
         res.status(http_status_1.NO_CONTENT)
             .end();

@@ -9,9 +9,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onActionStatusChanged = void 0;
+exports.onPaymentStatusChanged = exports.onActionStatusChanged = exports.onOrderStatusChanged = void 0;
 const alverca = require("@alverca/domain");
 const moment = require("moment-timezone");
+const onPaid_1 = require("./webhook/onPaid");
+const onRefunded_1 = require("./webhook/onRefunded");
+function onOrderStatusChanged(params) {
+    return (repos) => __awaiter(this, void 0, void 0, function* () {
+        // 注文を保管
+        yield repos.order.orderModel.findOneAndUpdate({ orderNumber: params.orderNumber }, { $setOnInsert: params }, { upsert: true })
+            .exec();
+    });
+}
+exports.onOrderStatusChanged = onOrderStatusChanged;
 /**
  * 予約使用アクション変更イベント処理
  */
@@ -99,3 +109,21 @@ function useReservationAction2report(params) {
         }
     });
 }
+/**
+ * 決済ステータス変更イベント
+ */
+function onPaymentStatusChanged(params) {
+    return (repos) => __awaiter(this, void 0, void 0, function* () {
+        switch (params.typeOf) {
+            case alverca.factory.chevre.actionType.PayAction:
+                yield onPaid_1.onPaid(params)(repos);
+                break;
+            case alverca.factory.chevre.actionType.RefundAction:
+                yield onRefunded_1.onRefunded(params)(repos);
+                break;
+            default:
+            // no op
+        }
+    });
+}
+exports.onPaymentStatusChanged = onPaymentStatusChanged;

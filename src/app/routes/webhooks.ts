@@ -6,37 +6,11 @@ import * as cinerinoapi from '@cinerino/sdk';
 import * as express from 'express';
 import * as mongoose from 'mongoose';
 
-import { onActionStatusChanged } from '../controllers/webhook';
+import { onActionStatusChanged, onOrderStatusChanged, onPaymentStatusChanged } from '../service/webhook';
 
 const webhooksRouter = express.Router();
 
 import { NO_CONTENT } from 'http-status';
-
-/**
- * 注文返金イベント
- * 購入者による手数料あり返品の場合に発生
- */
-webhooksRouter.post(
-    '/onReturnOrder',
-    async (req, res, next) => {
-        try {
-            const order = <cinerinoapi.factory.order.IOrder | undefined>req.body.data;
-
-            if (typeof order?.orderNumber === 'string') {
-                const reportRepo = new alverca.repository.Report(mongoose.connection);
-
-                await alverca.service.report.order.createRefundOrderReport({
-                    order: order
-                })({ report: reportRepo });
-            }
-
-            res.status(NO_CONTENT)
-                .end();
-        } catch (error) {
-            next(error);
-        }
-    }
-);
 
 /**
  * 注文ステータス変更イベント
@@ -47,20 +21,10 @@ webhooksRouter.post(
         try {
             const order = <cinerinoapi.factory.order.IOrder>req.body.data;
 
-            const reportRepo = new alverca.repository.Report(mongoose.connection);
+            const orderRepo = new alverca.repository.Order(mongoose.connection);
 
             if (typeof order?.orderNumber === 'string') {
-                // 注文から売上レポート作成
-                await alverca.service.report.order.createOrderReport({
-                    order: order
-                })({ report: reportRepo });
-
-                switch (order.orderStatus) {
-                    case cinerinoapi.factory.orderStatus.OrderReturned:
-                        break;
-
-                    default:
-                }
+                await onOrderStatusChanged(order)({ order: orderRepo });
             }
 
             res.status(NO_CONTENT)
@@ -110,15 +74,22 @@ webhooksRouter.post(
                 req.body.data;
 
             const actionRepo = new alverca.repository.Action(mongoose.connection);
+            const orderRepo = new alverca.repository.Order(mongoose.connection);
+            const reportRepo = new alverca.repository.Report(mongoose.connection);
 
-            // とりあえずアクション保管
             if (typeof action?.id === 'string' && typeof action?.typeOf === 'string') {
+                // とりあえずアクション保管
                 await actionRepo.actionModel.findByIdAndUpdate(
                     action.id,
                     { $setOnInsert: action },
                     { upsert: true }
                 )
                     .exec();
+
+                await onPaymentStatusChanged(action)({
+                    order: orderRepo,
+                    report: reportRepo
+                });
             }
 
             res.status(NO_CONTENT)
