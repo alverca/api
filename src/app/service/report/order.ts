@@ -77,9 +77,9 @@ export function createOrderReport(params: {
                     .map((o, index) => {
                         const unitPrice = getUnitPriceByAcceptedOffer(o);
 
-                        return reservation2report({
+                        return orderItem2report({
                             category: alverca.factory.report.order.ReportCategory.Reserved,
-                            r: o.itemOffered,
+                            item: o.itemOffered,
                             unitPrice: unitPrice,
                             order: params.order,
                             paymentSeatIndex: index,
@@ -96,9 +96,9 @@ export function createOrderReport(params: {
                     .map((o, index) => {
                         const unitPrice = getUnitPriceByAcceptedOffer(o);
 
-                        return reservation2report({
+                        return orderItem2report({
                             category: alverca.factory.report.order.ReportCategory.Cancelled,
-                            r: o.itemOffered,
+                            item: o.itemOffered,
                             unitPrice: unitPrice,
                             order: params.order,
                             paymentSeatIndex: index,
@@ -119,47 +119,12 @@ export function createOrderReport(params: {
 }
 
 /**
- * 返金された注文からレポートを作成する
- */
-// export function createRefundOrderReport(params: {
-//     order: cinerinoapi.factory.order.IOrder;
-// }) {
-//     return async (repos: { report: alverca.repository.Report }): Promise<void> => {
-//         const datas: alverca.factory.report.order.IReport[] = [];
-//         const acceptedOffers = params.order.acceptedOffers
-//             .filter((o) => o.itemOffered.typeOf === cinerinoapi.factory.chevre.reservationType.EventReservation);
-//         if (acceptedOffers.length > 0) {
-//             const acceptedOffer = acceptedOffers[0];
-//             const unitPrice = getUnitPriceByAcceptedOffer(acceptedOffer);
-
-//             datas.push({
-//                 ...reservation2report({
-//                     category: alverca.factory.report.order.ReportCategory.CancellationFee,
-//                     r: acceptedOffer.itemOffered,
-//                     unitPrice: unitPrice,
-//                     order: params.order,
-//                     // 返品手数料行にはpayment_seat_indexなし
-//                     paymentSeatIndex: undefined,
-//                     salesDate: moment(<Date>params.order.dateReturned)
-//                         .toDate()
-//                 })
-//             });
-//         }
-
-//         // 冪等性の確保!
-//         await Promise.all(datas.map(async (data) => {
-//             await repos.report.saveReport(data);
-//         }));
-//     };
-// }
-
-/**
  * 予約データをcsvデータ型に変換する
  */
 // tslint:disable-next-line:cyclomatic-complexity max-func-body-length
-function reservation2report(params: {
-    category: alverca.factory.report.order.ReportCategory;
-    r: cinerinoapi.factory.order.IItemOffered;
+function orderItem2report(params: {
+    category: alverca.factory.report.order.ReportCategory.Cancelled | alverca.factory.report.order.ReportCategory.Reserved;
+    item: cinerinoapi.factory.order.IItemOffered;
     unitPrice: number;
     order: cinerinoapi.factory.order.IOrder;
     paymentSeatIndex?: number;
@@ -231,8 +196,8 @@ function reservation2report(params: {
         }
     };
 
-    if (params.r.typeOf === cinerinoapi.factory.chevre.reservationType.EventReservation) {
-        const reservationByOrder = <cinerinoapi.factory.order.IReservation>params.r;
+    if (params.item.typeOf === cinerinoapi.factory.chevre.reservationType.EventReservation) {
+        const reservationByOrder = <cinerinoapi.factory.order.IReservation>params.item;
 
         // 注文アイテムが予約の場合
         const csvCodeByOrder = reservationByOrder.reservedTicket.ticketType.additionalProperty?.find(
@@ -266,26 +231,12 @@ function reservation2report(params: {
 
     let sortBy: string;
     switch (params.category) {
-        // case alverca.factory.report.order.ReportCategory.CancellationFee:
-        //     let cancellationFee = 0;
-        //     const returnerIdentifier = params.order.returner?.identifier;
-        //     if (Array.isArray(returnerIdentifier)) {
-        //         const cancellationFeeValue = returnerIdentifier.find((p) => p.name === 'cancellationFee')?.value;
-        //         if (cancellationFeeValue !== undefined) {
-        //             cancellationFee = Number(cancellationFeeValue);
-        //         }
-        //     }
-        //     amount = cancellationFee;
-
-        //     sortBy = getSortBy(params.order, params.r, '02');
-        //     break;
-
         case alverca.factory.report.order.ReportCategory.Cancelled:
-            sortBy = getSortBy(params.order, params.r, '01');
+            sortBy = getSortBy(params.order, params.item, '01');
             break;
 
         case alverca.factory.report.order.ReportCategory.Reserved:
-            sortBy = getSortBy(params.order, params.r, '00');
+            sortBy = getSortBy(params.order, params.item, '00');
             break;
 
         default:
