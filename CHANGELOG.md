@@ -8,12 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
-- 注文リポジトリを追加
-
 ### Changed
-
-- 売上レポートサービスソースをdomainから移行
-- 売上レポートを決済&返金アクションから作成するように変更
 
 ### Deprecated
 
@@ -22,6 +17,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Fixed
 
 ### Security
+
+## v44.3.0 - 2021-03-24
+
+### Added
+
+- 注文リポジトリを追加
+
+### Changed
+
+- 売上レポートサービスソースをdomainから移行
+- 売上レポートを決済&返金アクションから作成するように変更
 
 ## v44.2.1 - 2021-03-09
 
