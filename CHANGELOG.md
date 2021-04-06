@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Changed
 
+- 決済ステータス変更時にアクションを注文に保管するように調整
+
 ### Deprecated
 
 ### Removed

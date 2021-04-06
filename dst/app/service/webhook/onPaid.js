@@ -72,6 +72,9 @@ function onReturnFeePaid(params) {
         delete report._id;
         delete report.id;
         yield repos.report.saveReport(report);
+        // 注文に決済アクションを追加
+        yield repos.order.orderModel.findOneAndUpdate({ orderNumber }, { $addToSet: { actions: params } })
+            .exec();
     });
 }
 function onOrderPaid(params) {
@@ -94,5 +97,8 @@ function onOrderPaid(params) {
         yield order_1.createOrderReport({
             order: Object.assign(Object.assign({}, order), { orderStatus: cinerinoapi.factory.orderStatus.OrderProcessing })
         })(repos);
+        // 注文に決済アクションを追加
+        yield repos.order.orderModel.findOneAndUpdate({ orderNumber }, { $addToSet: { actions: params } })
+            .exec();
     });
 }

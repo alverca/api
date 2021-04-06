@@ -50,5 +50,8 @@ function onOrderRefunded(params) {
             order: Object.assign(Object.assign({}, order), { orderStatus: cinerinoapi.factory.orderStatus.OrderReturned, dateReturned: moment(params.startDate)
                     .toDate() })
         })(repos);
+        // 注文に決済アクションを追加
+        yield repos.order.orderModel.findOneAndUpdate({ orderNumber }, { $addToSet: { actions: params } })
+            .exec();
     });
 }

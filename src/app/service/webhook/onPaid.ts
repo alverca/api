@@ -29,7 +29,10 @@ export function onPaid(params: alverca.factory.chevre.action.trade.pay.IAction) 
 }
 
 function onReturnFeePaid(params: alverca.factory.chevre.action.trade.pay.IAction) {
-    return async (repos: { report: alverca.repository.Report }): Promise<void> => {
+    return async (repos: {
+        order: alverca.repository.Order;
+        report: alverca.repository.Report;
+    }): Promise<void> => {
         const orderNumber = (<any>params).purpose?.object?.orderNumber;
 
         if (typeof orderNumber !== 'string') {
@@ -76,6 +79,13 @@ function onReturnFeePaid(params: alverca.factory.chevre.action.trade.pay.IAction
         delete (<any>report).id;
 
         await repos.report.saveReport(report);
+
+        // 注文に決済アクションを追加
+        await repos.order.orderModel.findOneAndUpdate(
+            { orderNumber },
+            { $addToSet: <any>{ actions: params } }
+        )
+            .exec();
     };
 }
 
@@ -108,5 +118,12 @@ function onOrderPaid(params: alverca.factory.chevre.action.trade.pay.IAction) {
                 orderStatus: cinerinoapi.factory.orderStatus.OrderProcessing
             }
         })(repos);
+
+        // 注文に決済アクションを追加
+        await repos.order.orderModel.findOneAndUpdate(
+            { orderNumber },
+            { $addToSet: <any>{ actions: params } }
+        )
+            .exec();
     };
 }

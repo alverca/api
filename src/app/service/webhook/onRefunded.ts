@@ -54,5 +54,12 @@ function onOrderRefunded(params: alverca.factory.chevre.action.trade.refund.IAct
                     .toDate()
             }
         })(repos);
+
+        // 注文に決済アクションを追加
+        await repos.order.orderModel.findOneAndUpdate(
+            { orderNumber },
+            { $addToSet: <any>{ actions: params } }
+        )
+            .exec();
     };
 }
