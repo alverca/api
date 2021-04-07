@@ -54,7 +54,7 @@ paymentReportsRouter.get(
             const paymentMethodIdEq = req.query.order?.paymentMethods?.paymentMethodId?.$eq;
             if (typeof paymentMethodIdEq === 'string') {
                 matchStages.push({
-                    $match: { 'paymentMethods?.paymentMethodId': { $exists: true, $eq: paymentMethodIdEq } }
+                    $match: { 'paymentMethods.paymentMethodId': { $exists: true, $eq: paymentMethodIdEq } }
                 });
             }
 

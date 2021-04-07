@@ -53,7 +53,7 @@ paymentReportsRouter.get('', permitScopes_1.default(['admin']), ...[
         const paymentMethodIdEq = (_h = (_g = (_f = req.query.order) === null || _f === void 0 ? void 0 : _f.paymentMethods) === null || _g === void 0 ? void 0 : _g.paymentMethodId) === null || _h === void 0 ? void 0 : _h.$eq;
         if (typeof paymentMethodIdEq === 'string') {
             matchStages.push({
-                $match: { 'paymentMethods?.paymentMethodId': { $exists: true, $eq: paymentMethodIdEq } }
+                $match: { 'paymentMethods.paymentMethodId': { $exists: true, $eq: paymentMethodIdEq } }
             });
         }
         const aggregate = orderRepo.orderModel.aggregate([
