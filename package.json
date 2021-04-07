@@ -9,7 +9,7 @@
     }
   ],
   "dependencies": {
-    "@alverca/domain": "52.0.0-alpha.2",
+    "@alverca/domain": "52.0.0-alpha.3",
     "@cinerino/sdk": "1.21.1",
     "@motionpicture/express-middleware": "^0.1.1",
     "body-parser": "^1.19.0",

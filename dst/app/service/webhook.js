@@ -16,8 +16,11 @@ const onPaid_1 = require("./webhook/onPaid");
 const onRefunded_1 = require("./webhook/onRefunded");
 function onOrderStatusChanged(params) {
     return (repos) => __awaiter(this, void 0, void 0, function* () {
+        const numItems = (Array.isArray(params.acceptedOffers)) ? params.acceptedOffers.length : 0;
         // 注文を保管
-        yield repos.order.orderModel.findOneAndUpdate({ orderNumber: params.orderNumber }, { $setOnInsert: params }, { upsert: true })
+        yield repos.order.orderModel.findOneAndUpdate({ orderNumber: params.orderNumber }, {
+            $setOnInsert: Object.assign(Object.assign({}, params), { numItems })
+        }, { upsert: true })
             .exec();
     });
 }

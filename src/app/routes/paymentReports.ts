@@ -29,6 +29,7 @@ paymentReportsRouter.get(
             .toInt()
     ],
     validator,
+    // tslint:disable-next-line:max-func-body-length
     async (req, res, next) => {
         try {
             // tslint:disable-next-line:no-magic-numbers
@@ -39,17 +40,24 @@ paymentReportsRouter.get(
 
             const unwindAcceptedOffers = req.query.$unwindAcceptedOffers === '1';
 
-            const matchStages = [
-                {
-                    $match: {
-                        'project.id': {
-                            $exists: true,
-                            $eq: req.project?.id
-                        }
-                        // orderNumber: 'TTT3-0207796-8589840'
-                    }
-                }
-            ];
+            const matchStages: any[] = [{
+                $match: { 'project.id': { $eq: req.project?.id } }
+            }];
+
+            const orderNumberEq = req.query.order?.orderNumber?.$eq;
+            if (typeof orderNumberEq === 'string') {
+                matchStages.push({
+                    $match: { orderNumber: { $eq: orderNumberEq } }
+                });
+            }
+
+            const paymentMethodIdEq = req.query.order?.paymentMethods?.paymentMethodId?.$eq;
+            if (typeof paymentMethodIdEq === 'string') {
+                matchStages.push({
+                    $match: { 'paymentMethods?.paymentMethodId': { $exists: true, $eq: paymentMethodIdEq } }
+                });
+            }
+
             const aggregate = orderRepo.orderModel.aggregate([
                 { $unwind: '$actions' },
                 ...(unwindAcceptedOffers) ? [{ $unwind: '$acceptedOffers' }] : [],
@@ -64,16 +72,14 @@ paymentReportsRouter.get(
                         purpose: '$actions.purpose',
                         order: {
                             acceptedOffers: '$acceptedOffers',
+                            confirmationNumber: '$confirmationNumber',
                             customer: '$customer',
+                            numItems: '$numItems',
                             orderNumber: '$orderNumber',
                             orderDate: '$orderDate',
-                            numItemsByDB: {
-                                $cond: {
-                                    if: { $isArray: '$acceptedOffers' },
-                                    then: { $size: '$acceptedOffers' },
-                                    else: 0
-                                }
-                            }
+                            price: '$price',
+                            project: '$project',
+                            seller: '$seller'
                         }
                     }
                 }

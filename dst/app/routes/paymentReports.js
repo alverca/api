@@ -31,25 +31,31 @@ paymentReportsRouter.get('', permitScopes_1.default(['admin']), ...[
         .optional()
         .isInt()
         .toInt()
-], validator_1.default, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
+], validator_1.default, 
+// tslint:disable-next-line:max-func-body-length
+(req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     try {
         // tslint:disable-next-line:no-magic-numbers
         const limit = (typeof ((_a = req.query) === null || _a === void 0 ? void 0 : _a.limit) === 'number') ? Math.min(req.query.limit, 100) : 100;
         const page = (typeof ((_b = req.query) === null || _b === void 0 ? void 0 : _b.page) === 'number') ? Math.max(req.query.page, 1) : 1;
         const orderRepo = new alverca.repository.Order(mongoose.connection);
         const unwindAcceptedOffers = req.query.$unwindAcceptedOffers === '1';
-        const matchStages = [
-            {
-                $match: {
-                    'project.id': {
-                        $exists: true,
-                        $eq: (_c = req.project) === null || _c === void 0 ? void 0 : _c.id
-                    }
-                    // orderNumber: 'TTT3-0207796-8589840'
-                }
-            }
-        ];
+        const matchStages = [{
+                $match: { 'project.id': { $eq: (_c = req.project) === null || _c === void 0 ? void 0 : _c.id } }
+            }];
+        const orderNumberEq = (_e = (_d = req.query.order) === null || _d === void 0 ? void 0 : _d.orderNumber) === null || _e === void 0 ? void 0 : _e.$eq;
+        if (typeof orderNumberEq === 'string') {
+            matchStages.push({
+                $match: { orderNumber: { $eq: orderNumberEq } }
+            });
+        }
+        const paymentMethodIdEq = (_h = (_g = (_f = req.query.order) === null || _f === void 0 ? void 0 : _f.paymentMethods) === null || _g === void 0 ? void 0 : _g.paymentMethodId) === null || _h === void 0 ? void 0 : _h.$eq;
+        if (typeof paymentMethodIdEq === 'string') {
+            matchStages.push({
+                $match: { 'paymentMethods?.paymentMethodId': { $exists: true, $eq: paymentMethodIdEq } }
+            });
+        }
         const aggregate = orderRepo.orderModel.aggregate([
             { $unwind: '$actions' },
             ...(unwindAcceptedOffers) ? [{ $unwind: '$acceptedOffers' }] : [],
@@ -64,16 +70,14 @@ paymentReportsRouter.get('', permitScopes_1.default(['admin']), ...[
                     purpose: '$actions.purpose',
                     order: {
                         acceptedOffers: '$acceptedOffers',
+                        confirmationNumber: '$confirmationNumber',
                         customer: '$customer',
+                        numItems: '$numItems',
                         orderNumber: '$orderNumber',
                         orderDate: '$orderDate',
-                        numItemsByDB: {
-                            $cond: {
-                                if: { $isArray: '$acceptedOffers' },
-                                then: { $size: '$acceptedOffers' },
-                                else: 0
-                            }
-                        }
+                        price: '$price',
+                        project: '$project',
+                        seller: '$seller'
                     }
                 }
             }

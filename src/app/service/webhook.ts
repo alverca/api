@@ -9,10 +9,17 @@ export function onOrderStatusChanged(params: cinerinoapi.factory.order.IOrder) {
     return async (repos: {
         order: alverca.repository.Order;
     }) => {
+        const numItems = (Array.isArray(params.acceptedOffers)) ? params.acceptedOffers.length : 0;
+
         // 注文を保管
         await repos.order.orderModel.findOneAndUpdate(
             { orderNumber: params.orderNumber },
-            { $setOnInsert: params },
+            {
+                $setOnInsert: {
+                    ...params,
+                    numItems
+                }
+            },
             { upsert: true }
         )
             .exec();
