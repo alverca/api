@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const alverca = require("@alverca/domain");
 const express = require("express");
 const aggregateSales_1 = require("../aggregateSales");
+const paymentReports_1 = require("../paymentReports");
 const projectDetailRouter = express.Router();
 projectDetailRouter.use((req, _, next) => {
     var _a;
@@ -17,4 +18,5 @@ projectDetailRouter.use((req, _, next) => {
     next();
 });
 projectDetailRouter.use('/aggregateSales', aggregateSales_1.default);
+projectDetailRouter.use('/paymentReports', paymentReports_1.default);
 exports.default = projectDetailRouter;

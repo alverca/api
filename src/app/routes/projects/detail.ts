@@ -5,6 +5,7 @@ import * as alverca from '@alverca/domain';
 import * as express from 'express';
 
 import aggregateSalesRouter from '../aggregateSales';
+import paymentReportsRouter from '../paymentReports';
 
 const projectDetailRouter = express.Router();
 
@@ -20,5 +21,6 @@ projectDetailRouter.use((req, _, next) => {
 });
 
 projectDetailRouter.use('/aggregateSales', aggregateSalesRouter);
+projectDetailRouter.use('/paymentReports', paymentReportsRouter);
 
 export default projectDetailRouter;
