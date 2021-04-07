@@ -82,7 +82,7 @@ paymentReportsRouter.get('', permitScopes_1.default(['admin']), ...[
                 }
             }
         ]);
-        const actions = yield aggregate.limit(limit)
+        const actions = yield aggregate.limit(limit * page)
             .skip(limit * (page - 1))
             // .setOptions({ maxTimeMS: 10000 }))
             .exec();

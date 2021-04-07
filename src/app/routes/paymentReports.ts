@@ -85,7 +85,7 @@ paymentReportsRouter.get(
                 }
             ]);
 
-            const actions = await aggregate.limit(limit)
+            const actions = await aggregate.limit(limit * page)
                 .skip(limit * (page - 1))
                 // .setOptions({ maxTimeMS: 10000 }))
                 .exec();
