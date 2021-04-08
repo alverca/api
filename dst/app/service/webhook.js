@@ -64,6 +64,7 @@ function createOrder4report(params) {
 }
 function createAccountingReport(params) {
     return {
+        project: params.project,
         typeOf: 'Report',
         hasPart: [],
         mainEntity: params

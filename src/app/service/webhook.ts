@@ -10,6 +10,7 @@ export type IOrder4report = cinerinoapi.factory.order.IOrder & {
 };
 
 export interface IAccountingReport {
+    project: { id: string; typeOf: 'Project' };
     typeOf: 'Report';
     hasPart: any[];
     mainEntity: IOrder4report;
@@ -96,6 +97,7 @@ function createOrder4report(params: cinerinoapi.factory.order.IOrder): IOrder4re
 
 function createAccountingReport(params: IOrder4report): IAccountingReport {
     return {
+        project: params.project,
         typeOf: 'Report',
         hasPart: [],
         mainEntity: params
