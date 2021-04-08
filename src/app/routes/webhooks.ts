@@ -21,10 +21,11 @@ webhooksRouter.post(
         try {
             const order = <cinerinoapi.factory.order.IOrder>req.body.data;
 
+            const accountingReportRepo = new alverca.repository.AccountingReport(mongoose.connection);
             const orderRepo = new alverca.repository.Order(mongoose.connection);
 
             if (typeof order?.orderNumber === 'string') {
-                await onOrderStatusChanged(order)({ order: orderRepo });
+                await onOrderStatusChanged(order)({ accountingReport: accountingReportRepo, order: orderRepo });
             }
 
             res.status(NO_CONTENT)
@@ -73,6 +74,7 @@ webhooksRouter.post(
                 = <alverca.factory.chevre.action.IAction<alverca.factory.chevre.action.IAttributes<alverca.factory.chevre.actionType, any, any>> | undefined>
                 req.body.data;
 
+            const accountingReportRepo = new alverca.repository.AccountingReport(mongoose.connection);
             const actionRepo = new alverca.repository.Action(mongoose.connection);
             const orderRepo = new alverca.repository.Order(mongoose.connection);
             const reportRepo = new alverca.repository.Report(mongoose.connection);
@@ -87,6 +89,7 @@ webhooksRouter.post(
                     .exec();
 
                 await onPaymentStatusChanged(action)({
+                    accountingReport: accountingReportRepo,
                     order: orderRepo,
                     report: reportRepo
                 });

@@ -17,9 +17,13 @@ const onPaid_1 = require("./webhook/onPaid");
 const onRefunded_1 = require("./webhook/onRefunded");
 function onOrderStatusChanged(params) {
     return (repos) => __awaiter(this, void 0, void 0, function* () {
-        const setOnInsert = createOrder4report(params);
+        const order4report = createOrder4report(params);
         // 注文を保管
-        yield repos.order.orderModel.findOneAndUpdate({ orderNumber: params.orderNumber }, { $setOnInsert: setOnInsert }, { upsert: true })
+        yield repos.order.orderModel.findOneAndUpdate({ orderNumber: params.orderNumber }, { $setOnInsert: order4report }, { upsert: true })
+            .exec();
+        const accountingReport = createAccountingReport(order4report);
+        // 経理レポートを保管
+        yield repos.accountingReport.accountingReportModel.findOneAndUpdate({ 'mainEntity.orderNumber': params.orderNumber }, { $setOnInsert: accountingReport }, { upsert: true })
             .exec();
     });
 }
@@ -57,6 +61,13 @@ function createOrder4report(params) {
         : [];
     return Object.assign(Object.assign({}, params), { acceptedOffers,
         numItems });
+}
+function createAccountingReport(params) {
+    return {
+        typeOf: 'Report',
+        hasPart: [],
+        mainEntity: params
+    };
 }
 /**
  * 予約使用アクション変更イベント処理

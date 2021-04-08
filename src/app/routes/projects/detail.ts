@@ -4,6 +4,7 @@
 import * as alverca from '@alverca/domain';
 import * as express from 'express';
 
+import accountingReportsRouter from '../accountingReports';
 import aggregateSalesRouter from '../aggregateSales';
 import paymentReportsRouter from '../paymentReports';
 
@@ -20,6 +21,7 @@ projectDetailRouter.use((req, _, next) => {
     next();
 });
 
+projectDetailRouter.use('/accountingReports', accountingReportsRouter);
 projectDetailRouter.use('/aggregateSales', aggregateSalesRouter);
 projectDetailRouter.use('/paymentReports', paymentReportsRouter);
 

@@ -80,7 +80,8 @@ function onReturnFeePaid(params) {
                     .toDate()
             }
             : undefined);
-        yield repos.order.orderModel.findOneAndUpdate({ orderNumber }, { $addToSet: { actions: action4save } })
+        const childReport = { typeOf: 'Report', mainEntity: action4save };
+        yield repos.accountingReport.accountingReportModel.findOneAndUpdate({ 'mainEntity.orderNumber': orderNumber }, { $addToSet: { hasPart: childReport } })
             .exec();
     });
 }
@@ -112,7 +113,8 @@ function onOrderPaid(params) {
                     .toDate()
             }
             : undefined);
-        yield repos.order.orderModel.findOneAndUpdate({ orderNumber }, { $addToSet: { actions: action4save } })
+        const childReport = { typeOf: 'Report', mainEntity: action4save };
+        yield repos.accountingReport.accountingReportModel.findOneAndUpdate({ 'mainEntity.orderNumber': orderNumber }, { $addToSet: { hasPart: childReport } })
             .exec();
     });
 }

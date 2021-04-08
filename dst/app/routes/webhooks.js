@@ -24,9 +24,10 @@ const http_status_1 = require("http-status");
 webhooksRouter.post('/onOrderStatusChanged', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const order = req.body.data;
+        const accountingReportRepo = new alverca.repository.AccountingReport(mongoose.connection);
         const orderRepo = new alverca.repository.Order(mongoose.connection);
         if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
-            yield webhook_1.onOrderStatusChanged(order)({ order: orderRepo });
+            yield webhook_1.onOrderStatusChanged(order)({ accountingReport: accountingReportRepo, order: orderRepo });
         }
         res.status(http_status_1.NO_CONTENT)
             .end();
@@ -62,6 +63,7 @@ webhooksRouter.post('/onPaymentStatusChanged', (req, res, next) => __awaiter(voi
         const action 
         // tslint:disable-next-line:max-line-length
         = req.body.data;
+        const accountingReportRepo = new alverca.repository.AccountingReport(mongoose.connection);
         const actionRepo = new alverca.repository.Action(mongoose.connection);
         const orderRepo = new alverca.repository.Order(mongoose.connection);
         const reportRepo = new alverca.repository.Report(mongoose.connection);
@@ -70,6 +72,7 @@ webhooksRouter.post('/onPaymentStatusChanged', (req, res, next) => __awaiter(voi
             yield actionRepo.actionModel.findByIdAndUpdate(action.id, { $setOnInsert: action }, { upsert: true })
                 .exec();
             yield webhook_1.onPaymentStatusChanged(action)({
+                accountingReport: accountingReportRepo,
                 order: orderRepo,
                 report: reportRepo
             });

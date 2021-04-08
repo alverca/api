@@ -9,6 +9,7 @@ import { createOrderReport } from '../report/order';
 
 export function onPaid(params: alverca.factory.chevre.action.trade.pay.IAction) {
     return async (repos: {
+        accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;
         report: alverca.repository.Report;
     }): Promise<void> => {
@@ -30,6 +31,7 @@ export function onPaid(params: alverca.factory.chevre.action.trade.pay.IAction) 
 
 function onReturnFeePaid(params: alverca.factory.chevre.action.trade.pay.IAction) {
     return async (repos: {
+        accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;
         report: alverca.repository.Report;
     }): Promise<void> => {
@@ -92,9 +94,10 @@ function onReturnFeePaid(params: alverca.factory.chevre.action.trade.pay.IAction
                 }
                 : undefined
         };
-        await repos.order.orderModel.findOneAndUpdate(
-            { orderNumber },
-            { $addToSet: <any>{ actions: action4save } }
+        const childReport = { typeOf: 'Report', mainEntity: action4save };
+        await repos.accountingReport.accountingReportModel.findOneAndUpdate(
+            { 'mainEntity.orderNumber': orderNumber },
+            { $addToSet: <any>{ hasPart: childReport } }
         )
             .exec();
     };
@@ -102,6 +105,7 @@ function onReturnFeePaid(params: alverca.factory.chevre.action.trade.pay.IAction
 
 function onOrderPaid(params: alverca.factory.chevre.action.trade.pay.IAction) {
     return async (repos: {
+        accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;
         report: alverca.repository.Report;
     }): Promise<void> => {
@@ -142,9 +146,10 @@ function onOrderPaid(params: alverca.factory.chevre.action.trade.pay.IAction) {
                 }
                 : undefined
         };
-        await repos.order.orderModel.findOneAndUpdate(
-            { orderNumber },
-            { $addToSet: <any>{ actions: action4save } }
+        const childReport = { typeOf: 'Report', mainEntity: action4save };
+        await repos.accountingReport.accountingReportModel.findOneAndUpdate(
+            { 'mainEntity.orderNumber': orderNumber },
+            { $addToSet: <any>{ hasPart: childReport } }
         )
             .exec();
     };

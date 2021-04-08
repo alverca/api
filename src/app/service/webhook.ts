@@ -9,16 +9,33 @@ export type IOrder4report = cinerinoapi.factory.order.IOrder & {
     numItems: number;
 };
 
+export interface IAccountingReport {
+    typeOf: 'Report';
+    hasPart: any[];
+    mainEntity: IOrder4report;
+}
+
 export function onOrderStatusChanged(params: cinerinoapi.factory.order.IOrder) {
     return async (repos: {
+        accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;
     }) => {
-        const setOnInsert: IOrder4report = createOrder4report(params);
+        const order4report: IOrder4report = createOrder4report(params);
 
         // 注文を保管
         await repos.order.orderModel.findOneAndUpdate(
             { orderNumber: params.orderNumber },
-            { $setOnInsert: setOnInsert },
+            { $setOnInsert: order4report },
+            { upsert: true }
+        )
+            .exec();
+
+        const accountingReport: IAccountingReport = createAccountingReport(order4report);
+
+        // 経理レポートを保管
+        await repos.accountingReport.accountingReportModel.findOneAndUpdate(
+            { 'mainEntity.orderNumber': params.orderNumber },
+            { $setOnInsert: accountingReport },
             { upsert: true }
         )
             .exec();
@@ -74,6 +91,14 @@ function createOrder4report(params: cinerinoapi.factory.order.IOrder): IOrder4re
         ...params,
         acceptedOffers,
         numItems
+    };
+}
+
+function createAccountingReport(params: IOrder4report): IAccountingReport {
+    return {
+        typeOf: 'Report',
+        hasPart: [],
+        mainEntity: params
     };
 }
 
@@ -192,6 +217,7 @@ export function onPaymentStatusChanged(
     params: alverca.factory.chevre.action.IAction<alverca.factory.chevre.action.IAttributes<alverca.factory.chevre.actionType, any, any>>
 ) {
     return async (repos: {
+        accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;
         report: alverca.repository.Report;
     }): Promise<void> => {

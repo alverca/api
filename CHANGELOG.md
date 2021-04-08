@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Added
 
 - 決済レポート検索を追加
+- 経理レポート検索を追加
 
 ### Changed
 

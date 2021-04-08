@@ -9,6 +9,7 @@ import { createOrderReport } from '../report/order';
 
 export function onRefunded(params: alverca.factory.chevre.action.trade.refund.IAction) {
     return async (repos: {
+        accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;
         report: alverca.repository.Report;
     }): Promise<void> => {
@@ -25,6 +26,7 @@ export function onRefunded(params: alverca.factory.chevre.action.trade.refund.IA
 
 function onOrderRefunded(params: alverca.factory.chevre.action.trade.refund.IAction) {
     return async (repos: {
+        accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;
         report: alverca.repository.Report;
     }): Promise<void> => {
@@ -67,9 +69,10 @@ function onOrderRefunded(params: alverca.factory.chevre.action.trade.refund.IAct
                 }
                 : undefined
         };
-        await repos.order.orderModel.findOneAndUpdate(
-            { orderNumber },
-            { $addToSet: <any>{ actions: action4save } }
+        const childReport = { typeOf: 'Report', mainEntity: action4save };
+        await repos.accountingReport.accountingReportModel.findOneAndUpdate(
+            { 'mainEntity.orderNumber': orderNumber },
+            { $addToSet: <any>{ hasPart: childReport } }
         )
             .exec();
     };
