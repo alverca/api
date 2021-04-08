@@ -51,7 +51,14 @@ function onOrderRefunded(params) {
                     .toDate() })
         })(repos);
         // 注文に決済アクションを追加
-        yield repos.order.orderModel.findOneAndUpdate({ orderNumber }, { $addToSet: { actions: params } })
+        const action4save = Object.assign(Object.assign(Object.assign({}, params), { startDate: moment(params.startDate)
+                .toDate() }), (params.endDate !== undefined)
+            ? {
+                endDate: moment(params.startDate)
+                    .toDate()
+            }
+            : undefined);
+        yield repos.order.orderModel.findOneAndUpdate({ orderNumber }, { $addToSet: { actions: action4save } })
             .exec();
     });
 }

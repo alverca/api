@@ -73,7 +73,14 @@ function onReturnFeePaid(params) {
         delete report.id;
         yield repos.report.saveReport(report);
         // 注文に決済アクションを追加
-        yield repos.order.orderModel.findOneAndUpdate({ orderNumber }, { $addToSet: { actions: params } })
+        const action4save = Object.assign(Object.assign(Object.assign({}, params), { startDate: moment(params.startDate)
+                .toDate() }), (params.endDate !== undefined)
+            ? {
+                endDate: moment(params.startDate)
+                    .toDate()
+            }
+            : undefined);
+        yield repos.order.orderModel.findOneAndUpdate({ orderNumber }, { $addToSet: { actions: action4save } })
             .exec();
     });
 }
@@ -98,7 +105,14 @@ function onOrderPaid(params) {
             order: Object.assign(Object.assign({}, order), { orderStatus: cinerinoapi.factory.orderStatus.OrderProcessing })
         })(repos);
         // 注文に決済アクションを追加
-        yield repos.order.orderModel.findOneAndUpdate({ orderNumber }, { $addToSet: { actions: params } })
+        const action4save = Object.assign(Object.assign(Object.assign({}, params), { startDate: moment(params.startDate)
+                .toDate() }), (params.endDate !== undefined)
+            ? {
+                endDate: moment(params.startDate)
+                    .toDate()
+            }
+            : undefined);
+        yield repos.order.orderModel.findOneAndUpdate({ orderNumber }, { $addToSet: { actions: action4save } })
             .exec();
     });
 }

@@ -5,24 +5,75 @@ import * as moment from 'moment-timezone';
 import { onPaid } from './webhook/onPaid';
 import { onRefunded } from './webhook/onRefunded';
 
+export type IOrder4report = cinerinoapi.factory.order.IOrder & {
+    numItems: number;
+};
+
 export function onOrderStatusChanged(params: cinerinoapi.factory.order.IOrder) {
     return async (repos: {
         order: alverca.repository.Order;
     }) => {
-        const numItems = (Array.isArray(params.acceptedOffers)) ? params.acceptedOffers.length : 0;
+        const setOnInsert: IOrder4report = createOrder4report(params);
 
         // 注文を保管
         await repos.order.orderModel.findOneAndUpdate(
             { orderNumber: params.orderNumber },
-            {
-                $setOnInsert: {
-                    ...params,
-                    numItems
-                }
-            },
+            { $setOnInsert: setOnInsert },
             { upsert: true }
         )
             .exec();
+    };
+}
+
+function createOrder4report(params: cinerinoapi.factory.order.IOrder): IOrder4report {
+    const numItems: number = (Array.isArray(params.acceptedOffers)) ? params.acceptedOffers.length : 0;
+
+    // 必要な属性についてDate型に変換(でないと検索クエリを効率的に使えない)
+    const acceptedOffers = (Array.isArray(params.acceptedOffers))
+        ? params.acceptedOffers.map((o) => {
+            if (o.itemOffered.typeOf === cinerinoapi.factory.chevre.reservationType.EventReservation) {
+                let itemOffered = <cinerinoapi.factory.order.IReservation>o.itemOffered;
+                const reservationFor = itemOffered.reservationFor;
+                itemOffered = {
+                    ...itemOffered,
+                    reservationFor: {
+                        ...reservationFor,
+                        ...(typeof reservationFor.doorTime !== undefined)
+                            ? {
+                                doorTime: moment(reservationFor.doorTime)
+                                    .toDate()
+                            }
+                            : undefined,
+                        ...(typeof reservationFor.endDate !== undefined)
+                            ? {
+                                endDate: moment(reservationFor.endDate)
+                                    .toDate()
+                            }
+                            : undefined,
+                        ...(typeof reservationFor.startDate !== undefined)
+                            ? {
+                                startDate: moment(reservationFor.startDate)
+                                    .toDate()
+                            }
+                            : undefined
+
+                    }
+                };
+
+                return {
+                    ...o,
+                    itemOffered
+                };
+            } else {
+                return o;
+            }
+        })
+        : [];
+
+    return {
+        ...params,
+        acceptedOffers,
+        numItems
     };
 }
 

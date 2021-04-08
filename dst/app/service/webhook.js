@@ -11,20 +11,53 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.onPaymentStatusChanged = exports.onActionStatusChanged = exports.onOrderStatusChanged = void 0;
 const alverca = require("@alverca/domain");
+const cinerinoapi = require("@cinerino/sdk");
 const moment = require("moment-timezone");
 const onPaid_1 = require("./webhook/onPaid");
 const onRefunded_1 = require("./webhook/onRefunded");
 function onOrderStatusChanged(params) {
     return (repos) => __awaiter(this, void 0, void 0, function* () {
-        const numItems = (Array.isArray(params.acceptedOffers)) ? params.acceptedOffers.length : 0;
+        const setOnInsert = createOrder4report(params);
         // 注文を保管
-        yield repos.order.orderModel.findOneAndUpdate({ orderNumber: params.orderNumber }, {
-            $setOnInsert: Object.assign(Object.assign({}, params), { numItems })
-        }, { upsert: true })
+        yield repos.order.orderModel.findOneAndUpdate({ orderNumber: params.orderNumber }, { $setOnInsert: setOnInsert }, { upsert: true })
             .exec();
     });
 }
 exports.onOrderStatusChanged = onOrderStatusChanged;
+function createOrder4report(params) {
+    const numItems = (Array.isArray(params.acceptedOffers)) ? params.acceptedOffers.length : 0;
+    // 必要な属性についてDate型に変換(でないと検索クエリを効率的に使えない)
+    const acceptedOffers = (Array.isArray(params.acceptedOffers))
+        ? params.acceptedOffers.map((o) => {
+            if (o.itemOffered.typeOf === cinerinoapi.factory.chevre.reservationType.EventReservation) {
+                let itemOffered = o.itemOffered;
+                const reservationFor = itemOffered.reservationFor;
+                itemOffered = Object.assign(Object.assign({}, itemOffered), { reservationFor: Object.assign(Object.assign(Object.assign(Object.assign({}, reservationFor), (typeof reservationFor.doorTime !== undefined)
+                        ? {
+                            doorTime: moment(reservationFor.doorTime)
+                                .toDate()
+                        }
+                        : undefined), (typeof reservationFor.endDate !== undefined)
+                        ? {
+                            endDate: moment(reservationFor.endDate)
+                                .toDate()
+                        }
+                        : undefined), (typeof reservationFor.startDate !== undefined)
+                        ? {
+                            startDate: moment(reservationFor.startDate)
+                                .toDate()
+                        }
+                        : undefined) });
+                return Object.assign(Object.assign({}, o), { itemOffered });
+            }
+            else {
+                return o;
+            }
+        })
+        : [];
+    return Object.assign(Object.assign({}, params), { acceptedOffers,
+        numItems });
+}
 /**
  * 予約使用アクション変更イベント処理
  */

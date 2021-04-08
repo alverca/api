@@ -30,32 +30,34 @@ paymentReportsRouter.get('', permitScopes_1.default(['admin']), ...[
     express_validator_1.query('page')
         .optional()
         .isInt()
-        .toInt()
+        .toInt(),
+    express_validator_1.query('order.orderDate.$gte')
+        .optional()
+        .isISO8601()
+        .toDate(),
+    express_validator_1.query('order.orderDate.$lte')
+        .optional()
+        .isISO8601()
+        .toDate(),
+    express_validator_1.query('order.acceptedOffers.itemOffered.reservationFor.startDate.$gte')
+        .optional()
+        .isISO8601()
+        .toDate(),
+    express_validator_1.query('order.acceptedOffers.itemOffered.reservationFor.startDate.$lte')
+        .optional()
+        .isISO8601()
+        .toDate()
 ], validator_1.default, 
 // tslint:disable-next-line:max-func-body-length
 (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
+    var _a, _b;
     try {
         // tslint:disable-next-line:no-magic-numbers
         const limit = (typeof ((_a = req.query) === null || _a === void 0 ? void 0 : _a.limit) === 'number') ? Math.min(req.query.limit, 100) : 100;
         const page = (typeof ((_b = req.query) === null || _b === void 0 ? void 0 : _b.page) === 'number') ? Math.max(req.query.page, 1) : 1;
         const orderRepo = new alverca.repository.Order(mongoose.connection);
         const unwindAcceptedOffers = req.query.$unwindAcceptedOffers === '1';
-        const matchStages = [{
-                $match: { 'project.id': { $eq: (_c = req.project) === null || _c === void 0 ? void 0 : _c.id } }
-            }];
-        const orderNumberEq = (_e = (_d = req.query.order) === null || _d === void 0 ? void 0 : _d.orderNumber) === null || _e === void 0 ? void 0 : _e.$eq;
-        if (typeof orderNumberEq === 'string') {
-            matchStages.push({
-                $match: { orderNumber: { $eq: orderNumberEq } }
-            });
-        }
-        const paymentMethodIdEq = (_h = (_g = (_f = req.query.order) === null || _f === void 0 ? void 0 : _f.paymentMethods) === null || _g === void 0 ? void 0 : _g.paymentMethodId) === null || _h === void 0 ? void 0 : _h.$eq;
-        if (typeof paymentMethodIdEq === 'string') {
-            matchStages.push({
-                $match: { 'paymentMethods.paymentMethodId': { $exists: true, $eq: paymentMethodIdEq } }
-            });
-        }
+        const matchStages = request2matchStages(req);
         const aggregate = orderRepo.orderModel.aggregate([
             { $unwind: '$actions' },
             ...(unwindAcceptedOffers) ? [{ $unwind: '$acceptedOffers' }] : [],
@@ -125,4 +127,47 @@ paymentReportsRouter.get('', permitScopes_1.default(['admin']), ...[
         next(error);
     }
 }));
+function request2matchStages(req) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v;
+    const matchStages = [{
+            $match: { 'project.id': { $eq: (_a = req.project) === null || _a === void 0 ? void 0 : _a.id } }
+        }];
+    const orderNumberEq = (_c = (_b = req.query.order) === null || _b === void 0 ? void 0 : _b.orderNumber) === null || _c === void 0 ? void 0 : _c.$eq;
+    if (typeof orderNumberEq === 'string') {
+        matchStages.push({
+            $match: { orderNumber: { $eq: orderNumberEq } }
+        });
+    }
+    const paymentMethodIdEq = (_f = (_e = (_d = req.query.order) === null || _d === void 0 ? void 0 : _d.paymentMethods) === null || _e === void 0 ? void 0 : _e.paymentMethodId) === null || _f === void 0 ? void 0 : _f.$eq;
+    if (typeof paymentMethodIdEq === 'string') {
+        matchStages.push({
+            $match: { 'paymentMethods.paymentMethodId': { $exists: true, $eq: paymentMethodIdEq } }
+        });
+    }
+    const orderDateGte = (_h = (_g = req.query.order) === null || _g === void 0 ? void 0 : _g.orderDate) === null || _h === void 0 ? void 0 : _h.$gte;
+    if (orderDateGte instanceof Date) {
+        matchStages.push({
+            $match: { orderDate: { $gte: orderDateGte } }
+        });
+    }
+    const orderDateLte = (_k = (_j = req.query.order) === null || _j === void 0 ? void 0 : _j.orderDate) === null || _k === void 0 ? void 0 : _k.$lte;
+    if (orderDateLte instanceof Date) {
+        matchStages.push({
+            $match: { orderDate: { $lte: orderDateLte } }
+        });
+    }
+    const reservationForStartDateGte = (_q = (_p = (_o = (_m = (_l = req.query.order) === null || _l === void 0 ? void 0 : _l.acceptedOffers) === null || _m === void 0 ? void 0 : _m.itemOffered) === null || _o === void 0 ? void 0 : _o.reservationFor) === null || _p === void 0 ? void 0 : _p.startDate) === null || _q === void 0 ? void 0 : _q.$gte;
+    if (reservationForStartDateGte instanceof Date) {
+        matchStages.push({
+            $match: { 'acceptedOffers.itemOffered.reservationFor.startDate': { $exists: true, $gte: reservationForStartDateGte } }
+        });
+    }
+    const reservationForStartDateLte = (_v = (_u = (_t = (_s = (_r = req.query.order) === null || _r === void 0 ? void 0 : _r.acceptedOffers) === null || _s === void 0 ? void 0 : _s.itemOffered) === null || _t === void 0 ? void 0 : _t.reservationFor) === null || _u === void 0 ? void 0 : _u.startDate) === null || _v === void 0 ? void 0 : _v.$lte;
+    if (reservationForStartDateLte instanceof Date) {
+        matchStages.push({
+            $match: { 'acceptedOffers.itemOffered.reservationFor.startDate': { $exists: true, $lte: reservationForStartDateLte } }
+        });
+    }
+    return matchStages;
+}
 exports.default = paymentReportsRouter;

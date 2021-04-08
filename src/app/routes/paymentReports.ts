@@ -3,7 +3,7 @@
  */
 import * as alverca from '@alverca/domain';
 
-import { Router } from 'express';
+import { Request, Router } from 'express';
 import { query } from 'express-validator';
 import * as mongoose from 'mongoose';
 
@@ -26,7 +26,23 @@ paymentReportsRouter.get(
         query('page')
             .optional()
             .isInt()
-            .toInt()
+            .toInt(),
+        query('order.orderDate.$gte')
+            .optional()
+            .isISO8601()
+            .toDate(),
+        query('order.orderDate.$lte')
+            .optional()
+            .isISO8601()
+            .toDate(),
+        query('order.acceptedOffers.itemOffered.reservationFor.startDate.$gte')
+            .optional()
+            .isISO8601()
+            .toDate(),
+        query('order.acceptedOffers.itemOffered.reservationFor.startDate.$lte')
+            .optional()
+            .isISO8601()
+            .toDate()
     ],
     validator,
     // tslint:disable-next-line:max-func-body-length
@@ -39,24 +55,7 @@ paymentReportsRouter.get(
             const orderRepo = new alverca.repository.Order(mongoose.connection);
 
             const unwindAcceptedOffers = req.query.$unwindAcceptedOffers === '1';
-
-            const matchStages: any[] = [{
-                $match: { 'project.id': { $eq: req.project?.id } }
-            }];
-
-            const orderNumberEq = req.query.order?.orderNumber?.$eq;
-            if (typeof orderNumberEq === 'string') {
-                matchStages.push({
-                    $match: { orderNumber: { $eq: orderNumberEq } }
-                });
-            }
-
-            const paymentMethodIdEq = req.query.order?.paymentMethods?.paymentMethodId?.$eq;
-            if (typeof paymentMethodIdEq === 'string') {
-                matchStages.push({
-                    $match: { 'paymentMethods.paymentMethodId': { $exists: true, $eq: paymentMethodIdEq } }
-                });
-            }
+            const matchStages = request2matchStages(req);
 
             const aggregate = orderRepo.orderModel.aggregate([
                 { $unwind: '$actions' },
@@ -131,5 +130,55 @@ paymentReportsRouter.get(
         }
     }
 );
+
+function request2matchStages(req: Request): any[] {
+    const matchStages: any[] = [{
+        $match: { 'project.id': { $eq: req.project?.id } }
+    }];
+
+    const orderNumberEq = req.query.order?.orderNumber?.$eq;
+    if (typeof orderNumberEq === 'string') {
+        matchStages.push({
+            $match: { orderNumber: { $eq: orderNumberEq } }
+        });
+    }
+
+    const paymentMethodIdEq = req.query.order?.paymentMethods?.paymentMethodId?.$eq;
+    if (typeof paymentMethodIdEq === 'string') {
+        matchStages.push({
+            $match: { 'paymentMethods.paymentMethodId': { $exists: true, $eq: paymentMethodIdEq } }
+        });
+    }
+
+    const orderDateGte = req.query.order?.orderDate?.$gte;
+    if (orderDateGte instanceof Date) {
+        matchStages.push({
+            $match: { orderDate: { $gte: orderDateGte } }
+        });
+    }
+
+    const orderDateLte = req.query.order?.orderDate?.$lte;
+    if (orderDateLte instanceof Date) {
+        matchStages.push({
+            $match: { orderDate: { $lte: orderDateLte } }
+        });
+    }
+
+    const reservationForStartDateGte = req.query.order?.acceptedOffers?.itemOffered?.reservationFor?.startDate?.$gte;
+    if (reservationForStartDateGte instanceof Date) {
+        matchStages.push({
+            $match: { 'acceptedOffers.itemOffered.reservationFor.startDate': { $exists: true, $gte: reservationForStartDateGte } }
+        });
+    }
+
+    const reservationForStartDateLte = req.query.order?.acceptedOffers?.itemOffered?.reservationFor?.startDate?.$lte;
+    if (reservationForStartDateLte instanceof Date) {
+        matchStages.push({
+            $match: { 'acceptedOffers.itemOffered.reservationFor.startDate': { $exists: true, $lte: reservationForStartDateLte } }
+        });
+    }
+
+    return matchStages;
+}
 
 export default paymentReportsRouter;
