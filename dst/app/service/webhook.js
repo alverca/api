@@ -59,8 +59,14 @@ function createOrder4report(params) {
             }
         })
         : [];
-    return Object.assign(Object.assign({}, params), { acceptedOffers,
-        numItems });
+    return Object.assign(Object.assign(Object.assign({}, params), { orderDate: moment(params.orderDate)
+            .toDate(), acceptedOffers,
+        numItems }), (params.dateReturned !== null && params.dateReturned !== undefined)
+        ? {
+            dateReturned: moment(params.dateReturned)
+                .toDate()
+        }
+        : undefined);
 }
 function createAccountingReport(params) {
     return {

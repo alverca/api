@@ -90,8 +90,16 @@ function createOrder4report(params: cinerinoapi.factory.order.IOrder): IOrder4re
 
     return {
         ...params,
+        orderDate: moment(params.orderDate)
+            .toDate(),
         acceptedOffers,
-        numItems
+        numItems,
+        ...(params.dateReturned !== null && params.dateReturned !== undefined)
+            ? {
+                dateReturned: moment(params.dateReturned)
+                    .toDate()
+            }
+            : undefined
     };
 }
 
