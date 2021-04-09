@@ -64,22 +64,22 @@ accountingReportsRouter.get(
                     $project: {
                         _id: 0,
                         mainEntity: '$hasPart.mainEntity',
-                        typeOf: '$hasPart.mainEntity.typeOf',
-                        endDate: '$hasPart.mainEntity.endDate',
-                        startDate: '$hasPart.mainEntity.startDate',
-                        object: { $arrayElemAt: ['$hasPart.mainEntity.object', 0] },
-                        purpose: '$hasPart.mainEntity.purpose',
+                        // typeOf: '$hasPart.mainEntity.typeOf',
+                        // endDate: '$hasPart.mainEntity.endDate',
+                        // startDate: '$hasPart.mainEntity.startDate',
+                        // object: { $arrayElemAt: ['$hasPart.mainEntity.object', 0] },
+                        // purpose: '$hasPart.mainEntity.purpose',
                         isPartOf: {
-                            mainEntity: '$mainEntity',
-                            acceptedOffers: '$mainEntity.acceptedOffers',
-                            confirmationNumber: '$mainEntity.confirmationNumber',
-                            customer: '$mainEntity.customer',
-                            numItems: '$mainEntity.numItems',
-                            orderNumber: '$mainEntity.orderNumber',
-                            orderDate: '$mainEntity.orderDate',
-                            price: '$mainEntity.price',
-                            project: '$mainEntity.project',
-                            seller: '$mainEntity.seller'
+                            mainEntity: '$mainEntity'
+                            // acceptedOffers: '$mainEntity.acceptedOffers',
+                            // confirmationNumber: '$mainEntity.confirmationNumber',
+                            // customer: '$mainEntity.customer',
+                            // numItems: '$mainEntity.numItems',
+                            // orderNumber: '$mainEntity.orderNumber',
+                            // orderDate: '$mainEntity.orderDate',
+                            // price: '$mainEntity.price',
+                            // project: '$mainEntity.project',
+                            // seller: '$mainEntity.seller'
                         }
                     }
                 }
