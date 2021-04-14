@@ -75,18 +75,18 @@ webhooksRouter.post(
                 req.body.data;
 
             const accountingReportRepo = new alverca.repository.AccountingReport(mongoose.connection);
-            const actionRepo = new alverca.repository.Action(mongoose.connection);
+            // const actionRepo = new alverca.repository.Action(mongoose.connection);
             const orderRepo = new alverca.repository.Order(mongoose.connection);
             const reportRepo = new alverca.repository.Report(mongoose.connection);
 
             if (typeof action?.id === 'string' && typeof action?.typeOf === 'string') {
                 // とりあえずアクション保管
-                await actionRepo.actionModel.findByIdAndUpdate(
-                    action.id,
-                    { $setOnInsert: action },
-                    { upsert: true }
-                )
-                    .exec();
+                // await actionRepo.actionModel.findByIdAndUpdate(
+                //     action.id,
+                //     { $setOnInsert: action },
+                //     { upsert: true }
+                // )
+                //     .exec();
 
                 await onPaymentStatusChanged(action)({
                     accountingReport: accountingReportRepo,

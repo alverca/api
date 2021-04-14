@@ -64,13 +64,17 @@ webhooksRouter.post('/onPaymentStatusChanged', (req, res, next) => __awaiter(voi
         // tslint:disable-next-line:max-line-length
         = req.body.data;
         const accountingReportRepo = new alverca.repository.AccountingReport(mongoose.connection);
-        const actionRepo = new alverca.repository.Action(mongoose.connection);
+        // const actionRepo = new alverca.repository.Action(mongoose.connection);
         const orderRepo = new alverca.repository.Order(mongoose.connection);
         const reportRepo = new alverca.repository.Report(mongoose.connection);
         if (typeof (action === null || action === void 0 ? void 0 : action.id) === 'string' && typeof (action === null || action === void 0 ? void 0 : action.typeOf) === 'string') {
             // とりあえずアクション保管
-            yield actionRepo.actionModel.findByIdAndUpdate(action.id, { $setOnInsert: action }, { upsert: true })
-                .exec();
+            // await actionRepo.actionModel.findByIdAndUpdate(
+            //     action.id,
+            //     { $setOnInsert: action },
+            //     { upsert: true }
+            // )
+            //     .exec();
             yield webhook_1.onPaymentStatusChanged(action)({
                 accountingReport: accountingReportRepo,
                 order: orderRepo,
