@@ -193,28 +193,29 @@ function useReservationAction2report(params: {
                         .exec();
                 }
             } else {
+                // 入場取消は廃止済
                 // すでにdateUsedがあれば、比較して同一であればunset
-                if (oldDateUsed !== undefined) {
-                    if (moment(params.dateUsed)
-                        .isSame(moment(oldDateUsed))) {
-                        await repos.report.aggregateSaleModel.updateMany(
-                            {
-                                'reservation.id': {
-                                    $exists: true,
-                                    $eq: reservation.id
-                                }
-                            },
-                            {
-                                $unset: {
-                                    'reservation.reservedTicket.dateUsed': 1
-                                }
-                            }
-                        )
-                            .exec();
-                    }
-                } else {
-                    // 同一でなければ何もしない
-                }
+                // if (oldDateUsed !== undefined) {
+                //     if (moment(params.dateUsed)
+                //         .isSame(moment(oldDateUsed))) {
+                //         await repos.report.aggregateSaleModel.updateMany(
+                //             {
+                //                 'reservation.id': {
+                //                     $exists: true,
+                //                     $eq: reservation.id
+                //                 }
+                //             },
+                //             {
+                //                 $unset: {
+                //                     'reservation.reservedTicket.dateUsed': 1
+                //                 }
+                //             }
+                //         )
+                //             .exec();
+                //     }
+                // } else {
+                //     // 同一でなければ何もしない
+                // }
             }
         }
     };
