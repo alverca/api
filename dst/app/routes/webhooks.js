@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * ウェブフックルーター
  */
-const alverca = require("@alverca/domain");
+const alverca = require("@chevre/domain");
 const express = require("express");
 const mongoose = require("mongoose");
 const webhook_1 = require("../service/webhook");

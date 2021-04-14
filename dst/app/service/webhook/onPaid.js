@@ -13,7 +13,7 @@ exports.onPaid = void 0;
 /**
  * 決済イベント受信サービス
  */
-const alverca = require("@alverca/domain");
+const alverca = require("@chevre/domain");
 const cinerinoapi = require("@cinerino/sdk");
 const moment = require("moment-timezone");
 const order_1 = require("../report/order");
@@ -21,7 +21,7 @@ function onPaid(params) {
     return (repos) => __awaiter(this, void 0, void 0, function* () {
         switch (params.purpose.typeOf) {
             // 返品手数料決済であれば
-            case alverca.factory.chevre.actionType.ReturnAction:
+            case alverca.factory.actionType.ReturnAction:
                 yield onReturnFeePaid(params)(repos);
                 break;
             // 注文決済であれば

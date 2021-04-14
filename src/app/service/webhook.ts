@@ -1,4 +1,4 @@
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 import * as cinerinoapi from '@cinerino/sdk';
 import * as moment from 'moment-timezone';
 
@@ -116,26 +116,26 @@ function createAccountingReport(params: IOrder4report): IAccountingReport {
  * 予約使用アクション変更イベント処理
  */
 export function onActionStatusChanged(
-    params: alverca.factory.chevre.action.IAction<alverca.factory.chevre.action.IAttributes<alverca.factory.chevre.actionType, any, any>>
+    params: alverca.factory.action.IAction<alverca.factory.action.IAttributes<alverca.factory.actionType, any, any>>
 ) {
     return async (repos: {
         report: alverca.repository.Report;
     }) => {
         const action = params;
 
-        if (action.typeOf === alverca.factory.chevre.actionType.UseAction) {
+        if (action.typeOf === alverca.factory.actionType.UseAction) {
             const actionObject = action.object;
             if (Array.isArray(actionObject)) {
                 const reservations =
-                    <alverca.factory.chevre.reservation.IReservation<alverca.factory.chevre.reservationType.EventReservation>[]>
+                    <alverca.factory.reservation.IReservation<alverca.factory.reservationType.EventReservation>[]>
                     actionObject;
 
-                const attended = action.actionStatus === alverca.factory.chevre.actionStatusType.CompletedActionStatus;
+                const attended = action.actionStatus === alverca.factory.actionStatusType.CompletedActionStatus;
                 const dateUsed = moment(action.startDate)
                     .toDate();
 
                 await Promise.all(reservations.map(async (reservation) => {
-                    if (reservation.typeOf === alverca.factory.chevre.reservationType.EventReservation
+                    if (reservation.typeOf === alverca.factory.reservationType.EventReservation
                         && typeof reservation.id === 'string'
                         && reservation.id.length > 0) {
                         await useReservationAction2report({
@@ -154,7 +154,7 @@ export function onActionStatusChanged(
  * 予約をレポートに反映する
  */
 function useReservationAction2report(params: {
-    reservation: alverca.factory.chevre.reservation.IReservation<alverca.factory.chevre.reservationType.EventReservation>;
+    reservation: alverca.factory.reservation.IReservation<alverca.factory.reservationType.EventReservation>;
     attended: boolean;
     dateUsed: Date;
 }) {
@@ -225,7 +225,7 @@ function useReservationAction2report(params: {
  * 決済ステータス変更イベント
  */
 export function onPaymentStatusChanged(
-    params: alverca.factory.chevre.action.IAction<alverca.factory.chevre.action.IAttributes<alverca.factory.chevre.actionType, any, any>>
+    params: alverca.factory.action.IAction<alverca.factory.action.IAttributes<alverca.factory.actionType, any, any>>
 ) {
     return async (repos: {
         accountingReport: alverca.repository.AccountingReport;
@@ -233,12 +233,12 @@ export function onPaymentStatusChanged(
         report: alverca.repository.Report;
     }): Promise<void> => {
         switch (params.typeOf) {
-            case alverca.factory.chevre.actionType.PayAction:
-                await onPaid(<alverca.factory.chevre.action.trade.pay.IAction>params)(repos);
+            case alverca.factory.actionType.PayAction:
+                await onPaid(<alverca.factory.action.trade.pay.IAction>params)(repos);
                 break;
 
-            case alverca.factory.chevre.actionType.RefundAction:
-                await onRefunded(<alverca.factory.chevre.action.trade.refund.IAction>params)(repos);
+            case alverca.factory.actionType.RefundAction:
+                await onRefunded(<alverca.factory.action.trade.refund.IAction>params)(repos);
                 break;
 
             default:

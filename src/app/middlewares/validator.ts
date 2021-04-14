@@ -2,7 +2,7 @@
  * バリデーターミドルウェア
  * リクエストのパラメータ(query strings or body parameters)に対するバリデーション
  */
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { BAD_REQUEST } from 'http-status';

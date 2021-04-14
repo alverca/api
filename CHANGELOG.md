@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 - 決済ステータス変更時にアクションを注文に保管するように調整
 - 売上レポートへの入場取消連携を廃止
+- @chevre/domainで再実装
 
 ### Deprecated
 

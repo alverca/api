@@ -1,7 +1,7 @@
 /**
  * エラーハンドラーミドルウェア
  */
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 import * as createDebug from 'debug';
 import { NextFunction, Request, Response } from 'express';
 import {
@@ -35,12 +35,12 @@ export default (err: any, __: Request, res: Response, next: NextFunction) => {
         // エラー配列が入ってくることもある
         if (Array.isArray(err)) {
             apiError = new APIError(alvercaError2httpStatusCode(err[0]), err);
-        } else if (err instanceof alverca.factory.errors.SmartTheater) {
+        } else if (err instanceof alverca.factory.errors.Chevre) {
             apiError = new APIError(alvercaError2httpStatusCode(err), [err]);
         } else {
             // 500
             apiError =
-                new APIError(INTERNAL_SERVER_ERROR, [new alverca.factory.errors.SmartTheater(<any>'InternalServerError', err.message)]);
+                new APIError(INTERNAL_SERVER_ERROR, [new alverca.factory.errors.Chevre(<any>'InternalServerError', err.message)]);
         }
     }
 
@@ -53,7 +53,7 @@ export default (err: any, __: Request, res: Response, next: NextFunction) => {
 /**
  * AlvercaエラーをHTTPステータスコードへ変換する
  */
-function alvercaError2httpStatusCode(err: alverca.factory.errors.SmartTheater) {
+function alvercaError2httpStatusCode(err: alverca.factory.errors.Chevre) {
     let statusCode = BAD_REQUEST;
 
     switch (true) {

@@ -1,7 +1,7 @@
 /**
  * ウェブフックルーター
  */
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 import * as cinerinoapi from '@cinerino/sdk';
 import * as express from 'express';
 import * as mongoose from 'mongoose';
@@ -45,7 +45,7 @@ webhooksRouter.post(
         try {
             const action
                 // tslint:disable-next-line:max-line-length
-                = <alverca.factory.chevre.action.IAction<alverca.factory.chevre.action.IAttributes<alverca.factory.chevre.actionType, any, any>> | undefined>
+                = <alverca.factory.action.IAction<alverca.factory.action.IAttributes<alverca.factory.actionType, any, any>> | undefined>
                 req.body.data;
 
             const reportRepo = new alverca.repository.Report(mongoose.connection);
@@ -71,7 +71,7 @@ webhooksRouter.post(
         try {
             const action
                 // tslint:disable-next-line:max-line-length
-                = <alverca.factory.chevre.action.IAction<alverca.factory.chevre.action.IAttributes<alverca.factory.chevre.actionType, any, any>> | undefined>
+                = <alverca.factory.action.IAction<alverca.factory.action.IAttributes<alverca.factory.actionType, any, any>> | undefined>
                 req.body.data;
 
             const accountingReportRepo = new alverca.repository.AccountingReport(mongoose.connection);

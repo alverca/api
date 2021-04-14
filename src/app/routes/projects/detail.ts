@@ -1,7 +1,7 @@
 /**
  * プロジェクト詳細ルーター
  */
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 import * as express from 'express';
 
 import accountingReportsRouter from '../accountingReports';

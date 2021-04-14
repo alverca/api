@@ -1,7 +1,7 @@
 /**
  * スコープ許可ミドルウェア
  */
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 import * as createDebug from 'debug';
 import { NextFunction, Request, Response } from 'express';
 

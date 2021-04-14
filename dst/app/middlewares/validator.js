@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * バリデーターミドルウェア
  * リクエストのパラメータ(query strings or body parameters)に対するバリデーション
  */
-const alverca = require("@alverca/domain");
+const alverca = require("@chevre/domain");
 const express_validator_1 = require("express-validator");
 const http_status_1 = require("http-status");
 const api_1 = require("../error/api");

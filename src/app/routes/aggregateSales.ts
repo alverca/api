@@ -1,7 +1,7 @@
 /**
  * 売上レポートルーター
  */
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 
 import * as createDebug from 'debug';
 import { Router } from 'express';

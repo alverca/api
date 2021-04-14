@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 認証ミドルウェア
  */
-const alverca = require("@alverca/domain");
+const alverca = require("@chevre/domain");
 const cinerinoapi = require("@cinerino/sdk");
 const express_middleware_1 = require("@motionpicture/express-middleware");
 // 許可発行者リスト

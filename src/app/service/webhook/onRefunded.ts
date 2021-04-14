@@ -1,13 +1,13 @@
 /**
  * 返金イベント受信サービス
  */
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 import * as cinerinoapi from '@cinerino/sdk';
 import * as moment from 'moment-timezone';
 
 import { createOrderReport } from '../report/order';
 
-export function onRefunded(params: alverca.factory.chevre.action.trade.refund.IAction) {
+export function onRefunded(params: alverca.factory.action.trade.refund.IAction) {
     return async (repos: {
         accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;
@@ -15,7 +15,7 @@ export function onRefunded(params: alverca.factory.chevre.action.trade.refund.IA
     }): Promise<void> => {
         switch (params.purpose.typeOf) {
             // 返品手数料決済であれば
-            case alverca.factory.chevre.actionType.ReturnAction:
+            case alverca.factory.actionType.ReturnAction:
                 await onOrderRefunded(params)(repos);
                 break;
 
@@ -24,7 +24,7 @@ export function onRefunded(params: alverca.factory.chevre.action.trade.refund.IA
     };
 }
 
-function onOrderRefunded(params: alverca.factory.chevre.action.trade.refund.IAction) {
+function onOrderRefunded(params: alverca.factory.action.trade.refund.IAction) {
     return async (repos: {
         accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * エラーハンドラーミドルウェア
  */
-const alverca = require("@alverca/domain");
+const alverca = require("@chevre/domain");
 const createDebug = require("debug");
 const http_status_1 = require("http-status");
 const api_1 = require("../error/api");
@@ -23,13 +23,13 @@ exports.default = (err, __, res, next) => {
         if (Array.isArray(err)) {
             apiError = new api_1.APIError(alvercaError2httpStatusCode(err[0]), err);
         }
-        else if (err instanceof alverca.factory.errors.SmartTheater) {
+        else if (err instanceof alverca.factory.errors.Chevre) {
             apiError = new api_1.APIError(alvercaError2httpStatusCode(err), [err]);
         }
         else {
             // 500
             apiError =
-                new api_1.APIError(http_status_1.INTERNAL_SERVER_ERROR, [new alverca.factory.errors.SmartTheater('InternalServerError', err.message)]);
+                new api_1.APIError(http_status_1.INTERNAL_SERVER_ERROR, [new alverca.factory.errors.Chevre('InternalServerError', err.message)]);
         }
     }
     res.status(apiError.code)

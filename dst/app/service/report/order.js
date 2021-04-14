@@ -13,7 +13,7 @@ exports.createOrderReport = exports.PriceSpecificationType = void 0;
 /**
  * 売上レポートサービス
  */
-const alverca = require("@alverca/domain");
+const alverca = require("@chevre/domain");
 const cinerinoapi = require("@cinerino/sdk");
 const moment = require("moment-timezone");
 const util = require("util");

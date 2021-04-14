@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * プロジェクト詳細ルーター
  */
-const alverca = require("@alverca/domain");
+const alverca = require("@chevre/domain");
 const express = require("express");
 const accountingReports_1 = require("../accountingReports");
 const aggregateSales_1 = require("../aggregateSales");

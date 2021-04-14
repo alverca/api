@@ -1,7 +1,7 @@
 /**
  * 経理レポートルーター
  */
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 
 import { Request, Router } from 'express';
 import { query } from 'express-validator';

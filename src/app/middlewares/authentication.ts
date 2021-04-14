@@ -1,7 +1,7 @@
 /**
  * 認証ミドルウェア
  */
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 import * as cinerinoapi from '@cinerino/sdk';
 
 import { cognitoAuth } from '@motionpicture/express-middleware';

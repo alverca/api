@@ -4,7 +4,7 @@ exports.isScopesPermitted = void 0;
 /**
  * スコープ許可ミドルウェア
  */
-const alverca = require("@alverca/domain");
+const alverca = require("@chevre/domain");
 const createDebug = require("debug");
 const debug = createDebug('@alverca/api:middlewares:permitScopes');
 exports.default = (permittedScopes) => {

@@ -1,13 +1,13 @@
 /**
  * 売上レポートサービス
  */
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 import * as cinerinoapi from '@cinerino/sdk';
 import * as moment from 'moment-timezone';
 import * as util from 'util';
 
 export import PriceSpecificationType = cinerinoapi.factory.chevre.priceSpecificationType;
-export type ICompoundPriceSpecification = alverca.factory.chevre.compoundPriceSpecification.IPriceSpecification<PriceSpecificationType>;
+export type ICompoundPriceSpecification = alverca.factory.compoundPriceSpecification.IPriceSpecification<PriceSpecificationType>;
 
 /**
  * 注文アイテムから単価を取得する

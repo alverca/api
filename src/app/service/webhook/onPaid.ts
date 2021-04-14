@@ -1,13 +1,13 @@
 /**
  * 決済イベント受信サービス
  */
-import * as alverca from '@alverca/domain';
+import * as alverca from '@chevre/domain';
 import * as cinerinoapi from '@cinerino/sdk';
 import * as moment from 'moment-timezone';
 
 import { createOrderReport } from '../report/order';
 
-export function onPaid(params: alverca.factory.chevre.action.trade.pay.IAction) {
+export function onPaid(params: alverca.factory.action.trade.pay.IAction) {
     return async (repos: {
         accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;
@@ -15,7 +15,7 @@ export function onPaid(params: alverca.factory.chevre.action.trade.pay.IAction) 
     }): Promise<void> => {
         switch (params.purpose.typeOf) {
             // 返品手数料決済であれば
-            case alverca.factory.chevre.actionType.ReturnAction:
+            case alverca.factory.actionType.ReturnAction:
                 await onReturnFeePaid(params)(repos);
                 break;
 
@@ -29,7 +29,7 @@ export function onPaid(params: alverca.factory.chevre.action.trade.pay.IAction) 
     };
 }
 
-function onReturnFeePaid(params: alverca.factory.chevre.action.trade.pay.IAction) {
+function onReturnFeePaid(params: alverca.factory.action.trade.pay.IAction) {
     return async (repos: {
         accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;
@@ -103,14 +103,14 @@ function onReturnFeePaid(params: alverca.factory.chevre.action.trade.pay.IAction
     };
 }
 
-function onOrderPaid(params: alverca.factory.chevre.action.trade.pay.IAction) {
+function onOrderPaid(params: alverca.factory.action.trade.pay.IAction) {
     return async (repos: {
         accountingReport: alverca.repository.AccountingReport;
         order: alverca.repository.Order;
         report: alverca.repository.Report;
     }): Promise<void> => {
         // 注文を取得して、売上レポートに連携
-        const orderNumber = (<alverca.factory.chevre.action.trade.pay.IOrderAsPayPurpose>params.purpose)?.orderNumber;
+        const orderNumber = (<alverca.factory.action.trade.pay.IOrderAsPayPurpose>params.purpose)?.orderNumber;
         if (typeof orderNumber !== 'string') {
             throw new Error('params.purpose.orderNumber not string');
         }

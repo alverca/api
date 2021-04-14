@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.onPaymentStatusChanged = exports.onActionStatusChanged = exports.onOrderStatusChanged = void 0;
-const alverca = require("@alverca/domain");
+const alverca = require("@chevre/domain");
 const cinerinoapi = require("@cinerino/sdk");
 const moment = require("moment-timezone");
 const onPaid_1 = require("./webhook/onPaid");
@@ -82,15 +82,15 @@ function createAccountingReport(params) {
 function onActionStatusChanged(params) {
     return (repos) => __awaiter(this, void 0, void 0, function* () {
         const action = params;
-        if (action.typeOf === alverca.factory.chevre.actionType.UseAction) {
+        if (action.typeOf === alverca.factory.actionType.UseAction) {
             const actionObject = action.object;
             if (Array.isArray(actionObject)) {
                 const reservations = actionObject;
-                const attended = action.actionStatus === alverca.factory.chevre.actionStatusType.CompletedActionStatus;
+                const attended = action.actionStatus === alverca.factory.actionStatusType.CompletedActionStatus;
                 const dateUsed = moment(action.startDate)
                     .toDate();
                 yield Promise.all(reservations.map((reservation) => __awaiter(this, void 0, void 0, function* () {
-                    if (reservation.typeOf === alverca.factory.chevre.reservationType.EventReservation
+                    if (reservation.typeOf === alverca.factory.reservationType.EventReservation
                         && typeof reservation.id === 'string'
                         && reservation.id.length > 0) {
                         yield useReservationAction2report({
@@ -172,10 +172,10 @@ function useReservationAction2report(params) {
 function onPaymentStatusChanged(params) {
     return (repos) => __awaiter(this, void 0, void 0, function* () {
         switch (params.typeOf) {
-            case alverca.factory.chevre.actionType.PayAction:
+            case alverca.factory.actionType.PayAction:
                 yield onPaid_1.onPaid(params)(repos);
                 break;
-            case alverca.factory.chevre.actionType.RefundAction:
+            case alverca.factory.actionType.RefundAction:
                 yield onRefunded_1.onRefunded(params)(repos);
                 break;
             default:
