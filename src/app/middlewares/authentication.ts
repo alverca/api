@@ -2,7 +2,6 @@
  * 認証ミドルウェア
  */
 import * as chevre from '@chevre/domain';
-import * as cinerinoapi from '@cinerino/sdk';
 
 import { cognitoAuth } from '@motionpicture/express-middleware';
 import { NextFunction, Request, Response } from 'express';
@@ -17,7 +16,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         await cognitoAuth({
             issuers: ISSUERS,
             authorizedHandler: async (user, token) => {
-                const identifier: cinerinoapi.factory.person.IIdentifier = [
+                const identifier: chevre.factory.person.IIdentifier = [
                     {
                         name: 'tokenIssuer',
                         value: user.iss
@@ -46,12 +45,12 @@ export default async (req: Request, res: Response, next: NextFunction) => {
                     // no op
                 }
 
-                let programMembership: cinerinoapi.factory.programMembership.IProgramMembership | undefined;
+                let programMembership: chevre.factory.programMembership.IProgramMembership | undefined;
                 if (user.username !== undefined) {
                     programMembership = {
                         membershipNumber: user.username,
-                        project: { typeOf: cinerinoapi.factory.chevre.organizationType.Project, id: <string>req.project?.id },
-                        typeOf: cinerinoapi.factory.chevre.programMembership.ProgramMembershipType.ProgramMembership,
+                        project: { typeOf: chevre.factory.organizationType.Project, id: <string>req.project?.id },
+                        typeOf: chevre.factory.programMembership.ProgramMembershipType.ProgramMembership,
                         url: user.iss
                     };
                 }
@@ -59,7 +58,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
                 req.user = user;
                 req.accessToken = token;
                 req.agent = {
-                    typeOf: cinerinoapi.factory.personType.Person,
+                    typeOf: chevre.factory.personType.Person,
                     id: user.sub,
                     memberOf: programMembership,
                     identifier: identifier

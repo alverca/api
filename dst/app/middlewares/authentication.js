@@ -13,7 +13,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * 認証ミドルウェア
  */
 const chevre = require("@chevre/domain");
-const cinerinoapi = require("@cinerino/sdk");
 const express_middleware_1 = require("@motionpicture/express-middleware");
 // 許可発行者リスト
 const ISSUERS = process.env.TOKEN_ISSUERS.split(',');
@@ -57,15 +56,15 @@ exports.default = (req, res, next) => __awaiter(void 0, void 0, void 0, function
                 if (user.username !== undefined) {
                     programMembership = {
                         membershipNumber: user.username,
-                        project: { typeOf: cinerinoapi.factory.chevre.organizationType.Project, id: (_a = req.project) === null || _a === void 0 ? void 0 : _a.id },
-                        typeOf: cinerinoapi.factory.chevre.programMembership.ProgramMembershipType.ProgramMembership,
+                        project: { typeOf: chevre.factory.organizationType.Project, id: (_a = req.project) === null || _a === void 0 ? void 0 : _a.id },
+                        typeOf: chevre.factory.programMembership.ProgramMembershipType.ProgramMembership,
                         url: user.iss
                     };
                 }
                 req.user = user;
                 req.accessToken = token;
                 req.agent = {
-                    typeOf: cinerinoapi.factory.personType.Person,
+                    typeOf: chevre.factory.personType.Person,
                     id: user.sub,
                     memberOf: programMembership,
                     identifier: identifier

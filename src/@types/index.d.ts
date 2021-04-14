@@ -1,7 +1,7 @@
 /**
  * アプリケーション固有の型
  */
-import * as cinerinoapi from '@cinerino/sdk';
+import { factory } from '@chevre/domain';
 
 declare global {
     namespace Express {
@@ -21,8 +21,8 @@ declare global {
 
         // tslint:disable-next-line:interface-name
         export interface Request {
-            project?: cinerinoapi.factory.project.IProject;
-            agent: cinerinoapi.factory.person.IPerson;
+            project?: factory.project.IProject;
+            agent: factory.person.IPerson;
             user: IUser;
             accessToken: string;
         }

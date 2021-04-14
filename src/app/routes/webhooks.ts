@@ -2,7 +2,6 @@
  * ウェブフックルーター
  */
 import * as chevre from '@chevre/domain';
-import * as cinerinoapi from '@cinerino/sdk';
 import * as express from 'express';
 import * as mongoose from 'mongoose';
 
@@ -17,7 +16,7 @@ webhooksRouter.post(
     '/onOrderStatusChanged',
     async (req, res, next) => {
         try {
-            const order = <cinerinoapi.factory.order.IOrder>req.body.data;
+            const order = <chevre.factory.order.IOrder>req.body.data;
 
             const accountingReportRepo = new chevre.repository.AccountingReport(mongoose.connection);
             const orderRepo = new chevre.repository.Order(mongoose.connection);
