@@ -6,8 +6,6 @@ import * as cinerinoapi from '@cinerino/sdk';
 import * as express from 'express';
 import * as mongoose from 'mongoose';
 
-import { onActionStatusChanged, onOrderStatusChanged, onPaymentStatusChanged } from '../service/webhook';
-
 const webhooksRouter = express.Router();
 
 import { NO_CONTENT } from 'http-status';
@@ -25,7 +23,7 @@ webhooksRouter.post(
             const orderRepo = new chevre.repository.Order(mongoose.connection);
 
             if (typeof order?.orderNumber === 'string') {
-                await onOrderStatusChanged(order)({ accountingReport: accountingReportRepo, order: orderRepo });
+                await chevre.service.webhook.onOrderStatusChanged(order)({ accountingReport: accountingReportRepo, order: orderRepo });
             }
 
             res.status(NO_CONTENT)
@@ -51,7 +49,7 @@ webhooksRouter.post(
             const reportRepo = new chevre.repository.Report(mongoose.connection);
 
             if (typeof action?.typeOf === 'string') {
-                await onActionStatusChanged(action)({ report: reportRepo });
+                await chevre.service.webhook.onActionStatusChanged(action)({ report: reportRepo });
             }
 
             res.status(NO_CONTENT)
@@ -88,7 +86,7 @@ webhooksRouter.post(
                 // )
                 //     .exec();
 
-                await onPaymentStatusChanged(action)({
+                await chevre.service.webhook.onPaymentStatusChanged(action)({
                     accountingReport: accountingReportRepo,
                     order: orderRepo,
                     report: reportRepo

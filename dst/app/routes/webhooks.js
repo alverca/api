@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const chevre = require("@chevre/domain");
 const express = require("express");
 const mongoose = require("mongoose");
-const webhook_1 = require("../service/webhook");
 const webhooksRouter = express.Router();
 const http_status_1 = require("http-status");
 /**
@@ -27,7 +26,7 @@ webhooksRouter.post('/onOrderStatusChanged', (req, res, next) => __awaiter(void 
         const accountingReportRepo = new chevre.repository.AccountingReport(mongoose.connection);
         const orderRepo = new chevre.repository.Order(mongoose.connection);
         if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
-            yield webhook_1.onOrderStatusChanged(order)({ accountingReport: accountingReportRepo, order: orderRepo });
+            yield chevre.service.webhook.onOrderStatusChanged(order)({ accountingReport: accountingReportRepo, order: orderRepo });
         }
         res.status(http_status_1.NO_CONTENT)
             .end();
@@ -46,7 +45,7 @@ webhooksRouter.post('/onActionStatusChanged', (req, res, next) => __awaiter(void
         = req.body.data;
         const reportRepo = new chevre.repository.Report(mongoose.connection);
         if (typeof (action === null || action === void 0 ? void 0 : action.typeOf) === 'string') {
-            yield webhook_1.onActionStatusChanged(action)({ report: reportRepo });
+            yield chevre.service.webhook.onActionStatusChanged(action)({ report: reportRepo });
         }
         res.status(http_status_1.NO_CONTENT)
             .end();
@@ -75,7 +74,7 @@ webhooksRouter.post('/onPaymentStatusChanged', (req, res, next) => __awaiter(voi
             //     { upsert: true }
             // )
             //     .exec();
-            yield webhook_1.onPaymentStatusChanged(action)({
+            yield chevre.service.webhook.onPaymentStatusChanged(action)({
                 accountingReport: accountingReportRepo,
                 order: orderRepo,
                 report: reportRepo
