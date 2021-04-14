@@ -13,7 +13,7 @@ exports.createOrderReport = exports.PriceSpecificationType = void 0;
 /**
  * 売上レポートサービス
  */
-const alverca = require("@chevre/domain");
+const chevre = require("@chevre/domain");
 const cinerinoapi = require("@cinerino/sdk");
 const moment = require("moment-timezone");
 const util = require("util");
@@ -66,7 +66,7 @@ function createOrderReport(params) {
                     .map((o, index) => {
                     const unitPrice = getUnitPriceByAcceptedOffer(o);
                     return orderItem2report({
-                        category: alverca.factory.report.order.ReportCategory.Reserved,
+                        category: chevre.factory.report.order.ReportCategory.Reserved,
                         item: o.itemOffered,
                         unitPrice: unitPrice,
                         order: params.order,
@@ -82,7 +82,7 @@ function createOrderReport(params) {
                     .map((o, index) => {
                     const unitPrice = getUnitPriceByAcceptedOffer(o);
                     return orderItem2report({
-                        category: alverca.factory.report.order.ReportCategory.Cancelled,
+                        category: chevre.factory.report.order.ReportCategory.Cancelled,
                         item: o.itemOffered,
                         unitPrice: unitPrice,
                         order: params.order,
@@ -190,10 +190,10 @@ function orderItem2report(params) {
     }
     let sortBy;
     switch (params.category) {
-        case alverca.factory.report.order.ReportCategory.Cancelled:
+        case chevre.factory.report.order.ReportCategory.Cancelled:
             sortBy = getSortBy(params.order, params.item, '01');
             break;
-        case alverca.factory.report.order.ReportCategory.Reserved:
+        case chevre.factory.report.order.ReportCategory.Reserved:
             sortBy = getSortBy(params.order, params.item, '00');
             break;
         default:

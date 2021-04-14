@@ -1,11 +1,11 @@
 /**
  * スコープ許可ミドルウェア
  */
-import * as alverca from '@chevre/domain';
+import * as chevre from '@chevre/domain';
 import * as createDebug from 'debug';
 import { NextFunction, Request, Response } from 'express';
 
-const debug = createDebug('@alverca/api:middlewares:permitScopes');
+const debug = createDebug('@chevre/api:middlewares:permitScopes');
 
 /**
  * スコープインターフェース
@@ -34,7 +34,7 @@ export default (permittedScopes: IScope[]) => {
         try {
             debug('checking scope requirements...', permittedScopesWithResourceServerIdentifier);
             if (!isScopesPermitted(req.user.scopes, permittedScopesWithResourceServerIdentifier)) {
-                next(new alverca.factory.errors.Forbidden('scope requirements not satisfied'));
+                next(new chevre.factory.errors.Forbidden('scope requirements not satisfied'));
             } else {
                 next();
             }

@@ -4,7 +4,7 @@
 import * as createDebug from 'debug';
 import * as mongoose from 'mongoose';
 
-const debug = createDebug('@alverca/api:connectMongo');
+const debug = createDebug('@chevre/api:connectMongo');
 const PING_INTERVAL = 10000;
 const MONGOLAB_URI = <string>process.env.MONGOLAB_URI;
 

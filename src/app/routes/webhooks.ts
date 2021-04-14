@@ -1,7 +1,7 @@
 /**
  * ウェブフックルーター
  */
-import * as alverca from '@chevre/domain';
+import * as chevre from '@chevre/domain';
 import * as cinerinoapi from '@cinerino/sdk';
 import * as express from 'express';
 import * as mongoose from 'mongoose';
@@ -21,8 +21,8 @@ webhooksRouter.post(
         try {
             const order = <cinerinoapi.factory.order.IOrder>req.body.data;
 
-            const accountingReportRepo = new alverca.repository.AccountingReport(mongoose.connection);
-            const orderRepo = new alverca.repository.Order(mongoose.connection);
+            const accountingReportRepo = new chevre.repository.AccountingReport(mongoose.connection);
+            const orderRepo = new chevre.repository.Order(mongoose.connection);
 
             if (typeof order?.orderNumber === 'string') {
                 await onOrderStatusChanged(order)({ accountingReport: accountingReportRepo, order: orderRepo });
@@ -45,10 +45,10 @@ webhooksRouter.post(
         try {
             const action
                 // tslint:disable-next-line:max-line-length
-                = <alverca.factory.action.IAction<alverca.factory.action.IAttributes<alverca.factory.actionType, any, any>> | undefined>
+                = <chevre.factory.action.IAction<chevre.factory.action.IAttributes<chevre.factory.actionType, any, any>> | undefined>
                 req.body.data;
 
-            const reportRepo = new alverca.repository.Report(mongoose.connection);
+            const reportRepo = new chevre.repository.Report(mongoose.connection);
 
             if (typeof action?.typeOf === 'string') {
                 await onActionStatusChanged(action)({ report: reportRepo });
@@ -71,13 +71,13 @@ webhooksRouter.post(
         try {
             const action
                 // tslint:disable-next-line:max-line-length
-                = <alverca.factory.action.IAction<alverca.factory.action.IAttributes<alverca.factory.actionType, any, any>> | undefined>
+                = <chevre.factory.action.IAction<chevre.factory.action.IAttributes<chevre.factory.actionType, any, any>> | undefined>
                 req.body.data;
 
-            const accountingReportRepo = new alverca.repository.AccountingReport(mongoose.connection);
-            // const actionRepo = new alverca.repository.Action(mongoose.connection);
-            const orderRepo = new alverca.repository.Order(mongoose.connection);
-            const reportRepo = new alverca.repository.Report(mongoose.connection);
+            const accountingReportRepo = new chevre.repository.AccountingReport(mongoose.connection);
+            // const actionRepo = new chevre.repository.Action(mongoose.connection);
+            const orderRepo = new chevre.repository.Order(mongoose.connection);
+            const reportRepo = new chevre.repository.Report(mongoose.connection);
 
             if (typeof action?.id === 'string' && typeof action?.typeOf === 'string') {
                 // とりあえずアクション保管

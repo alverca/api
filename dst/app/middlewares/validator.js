@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * バリデーターミドルウェア
  * リクエストのパラメータ(query strings or body parameters)に対するバリデーション
  */
-const alverca = require("@chevre/domain");
+const chevre = require("@chevre/domain");
 const express_validator_1 = require("express-validator");
 const http_status_1 = require("http-status");
 const api_1 = require("../error/api");
@@ -22,7 +22,7 @@ exports.default = (req, __, next) => __awaiter(void 0, void 0, void 0, function*
     if (!validatorResult.isEmpty()) {
         const errors = validatorResult.array()
             .map((mappedRrror) => {
-            return new alverca.factory.errors.Argument(mappedRrror.param, mappedRrror.msg);
+            return new chevre.factory.errors.Argument(mappedRrror.param, mappedRrror.msg);
         });
         next(new api_1.APIError(http_status_1.BAD_REQUEST, errors));
     }

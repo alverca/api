@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * ウェブフックルーター
  */
-const alverca = require("@chevre/domain");
+const chevre = require("@chevre/domain");
 const express = require("express");
 const mongoose = require("mongoose");
 const webhook_1 = require("../service/webhook");
@@ -24,8 +24,8 @@ const http_status_1 = require("http-status");
 webhooksRouter.post('/onOrderStatusChanged', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const order = req.body.data;
-        const accountingReportRepo = new alverca.repository.AccountingReport(mongoose.connection);
-        const orderRepo = new alverca.repository.Order(mongoose.connection);
+        const accountingReportRepo = new chevre.repository.AccountingReport(mongoose.connection);
+        const orderRepo = new chevre.repository.Order(mongoose.connection);
         if (typeof (order === null || order === void 0 ? void 0 : order.orderNumber) === 'string') {
             yield webhook_1.onOrderStatusChanged(order)({ accountingReport: accountingReportRepo, order: orderRepo });
         }
@@ -44,7 +44,7 @@ webhooksRouter.post('/onActionStatusChanged', (req, res, next) => __awaiter(void
         const action 
         // tslint:disable-next-line:max-line-length
         = req.body.data;
-        const reportRepo = new alverca.repository.Report(mongoose.connection);
+        const reportRepo = new chevre.repository.Report(mongoose.connection);
         if (typeof (action === null || action === void 0 ? void 0 : action.typeOf) === 'string') {
             yield webhook_1.onActionStatusChanged(action)({ report: reportRepo });
         }
@@ -63,10 +63,10 @@ webhooksRouter.post('/onPaymentStatusChanged', (req, res, next) => __awaiter(voi
         const action 
         // tslint:disable-next-line:max-line-length
         = req.body.data;
-        const accountingReportRepo = new alverca.repository.AccountingReport(mongoose.connection);
-        // const actionRepo = new alverca.repository.Action(mongoose.connection);
-        const orderRepo = new alverca.repository.Order(mongoose.connection);
-        const reportRepo = new alverca.repository.Report(mongoose.connection);
+        const accountingReportRepo = new chevre.repository.AccountingReport(mongoose.connection);
+        // const actionRepo = new chevre.repository.Action(mongoose.connection);
+        const orderRepo = new chevre.repository.Order(mongoose.connection);
+        const reportRepo = new chevre.repository.Report(mongoose.connection);
         if (typeof (action === null || action === void 0 ? void 0 : action.id) === 'string' && typeof (action === null || action === void 0 ? void 0 : action.typeOf) === 'string') {
             // とりあえずアクション保管
             // await actionRepo.actionModel.findByIdAndUpdate(

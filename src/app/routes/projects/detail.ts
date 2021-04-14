@@ -1,7 +1,7 @@
 /**
  * プロジェクト詳細ルーター
  */
-import * as alverca from '@chevre/domain';
+import * as chevre from '@chevre/domain';
 import * as express from 'express';
 
 import accountingReportsRouter from '../accountingReports';
@@ -13,7 +13,7 @@ const projectDetailRouter = express.Router();
 projectDetailRouter.use((req, _, next) => {
     // プロジェクト未指定は拒否
     if (typeof req.project?.id !== 'string') {
-        next(new alverca.factory.errors.Forbidden('project not specified'));
+        next(new chevre.factory.errors.Forbidden('project not specified'));
 
         return;
     }

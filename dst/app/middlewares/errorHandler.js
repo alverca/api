@@ -3,11 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * エラーハンドラーミドルウェア
  */
-const alverca = require("@chevre/domain");
+const chevre = require("@chevre/domain");
 const createDebug = require("debug");
 const http_status_1 = require("http-status");
 const api_1 = require("../error/api");
-const debug = createDebug('@alverca/api:middlewares:errorHandler');
+const debug = createDebug('@chevre/api:middlewares:errorHandler');
 exports.default = (err, __, res, next) => {
     debug('handling err...', err);
     if (res.headersSent) {
@@ -21,15 +21,15 @@ exports.default = (err, __, res, next) => {
     else {
         // エラー配列が入ってくることもある
         if (Array.isArray(err)) {
-            apiError = new api_1.APIError(alvercaError2httpStatusCode(err[0]), err);
+            apiError = new api_1.APIError(chevreError2httpStatusCode(err[0]), err);
         }
-        else if (err instanceof alverca.factory.errors.Chevre) {
-            apiError = new api_1.APIError(alvercaError2httpStatusCode(err), [err]);
+        else if (err instanceof chevre.factory.errors.Chevre) {
+            apiError = new api_1.APIError(chevreError2httpStatusCode(err), [err]);
         }
         else {
             // 500
             apiError =
-                new api_1.APIError(http_status_1.INTERNAL_SERVER_ERROR, [new alverca.factory.errors.Chevre('InternalServerError', err.message)]);
+                new api_1.APIError(http_status_1.INTERNAL_SERVER_ERROR, [new chevre.factory.errors.Chevre('InternalServerError', err.message)]);
         }
     }
     res.status(apiError.code)
@@ -38,37 +38,37 @@ exports.default = (err, __, res, next) => {
     });
 };
 /**
- * AlvercaエラーをHTTPステータスコードへ変換する
+ * ChevreエラーをHTTPステータスコードへ変換する
  */
-function alvercaError2httpStatusCode(err) {
+function chevreError2httpStatusCode(err) {
     let statusCode = http_status_1.BAD_REQUEST;
     switch (true) {
         // 401
-        case (err instanceof alverca.factory.errors.Unauthorized):
+        case (err instanceof chevre.factory.errors.Unauthorized):
             statusCode = http_status_1.UNAUTHORIZED;
             break;
         // 403
-        case (err instanceof alverca.factory.errors.Forbidden):
+        case (err instanceof chevre.factory.errors.Forbidden):
             statusCode = http_status_1.FORBIDDEN;
             break;
         // 404
-        case (err instanceof alverca.factory.errors.NotFound):
+        case (err instanceof chevre.factory.errors.NotFound):
             statusCode = http_status_1.NOT_FOUND;
             break;
         // 409
-        case (err instanceof alverca.factory.errors.AlreadyInUse):
+        case (err instanceof chevre.factory.errors.AlreadyInUse):
             statusCode = http_status_1.CONFLICT;
             break;
         // 429
-        case (err instanceof alverca.factory.errors.RateLimitExceeded):
+        case (err instanceof chevre.factory.errors.RateLimitExceeded):
             statusCode = http_status_1.TOO_MANY_REQUESTS;
             break;
         // 502
-        case (err instanceof alverca.factory.errors.NotImplemented):
+        case (err instanceof chevre.factory.errors.NotImplemented):
             statusCode = http_status_1.NOT_IMPLEMENTED;
             break;
         // 503
-        case (err instanceof alverca.factory.errors.ServiceUnavailable):
+        case (err instanceof chevre.factory.errors.ServiceUnavailable):
             statusCode = http_status_1.SERVICE_UNAVAILABLE;
             break;
         // 400

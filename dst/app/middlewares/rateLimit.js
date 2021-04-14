@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const alverca = require("@chevre/domain");
+const chevre = require("@chevre/domain");
 const middlewares = require("@motionpicture/express-middleware");
 const ioredis = require("ioredis");
 const UNIT_IN_SECONDS = (process.env.RATE_LIMIT_UNIT_IN_SECONDS !== undefined) ? Number(process.env.RATE_LIMIT_UNIT_IN_SECONDS) : 1;
@@ -26,8 +26,8 @@ exports.default = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     try {
         const routeIdentifier = `${req.baseUrl}${req.path}`;
         const rateLimitScope = (typeof ((_a = req.project) === null || _a === void 0 ? void 0 : _a.id) === 'string')
-            ? `alverca-api:${req.project.id}:rateLimit:${routeIdentifier}:${req.method}`
-            : `alverca-api:rateLimit:${routeIdentifier}:${req.method}`;
+            ? `chevre-api:${req.project.id}:rateLimit:${routeIdentifier}:${req.method}`
+            : `chevre-api:rateLimit:${routeIdentifier}:${req.method}`;
         yield middlewares.rateLimit({
             redisClient: redisClient,
             aggregationUnitInSeconds: UNIT_IN_SECONDS,
@@ -36,7 +36,7 @@ exports.default = (req, res, next) => __awaiter(void 0, void 0, void 0, function
             limitExceededHandler: (_, __, resOnLimitExceeded, nextOnLimitExceeded) => {
                 resOnLimitExceeded.setHeader('Retry-After', UNIT_IN_SECONDS);
                 const message = `Retry after ${UNIT_IN_SECONDS} seconds`;
-                nextOnLimitExceeded(new alverca.factory.errors.RateLimitExceeded(message));
+                nextOnLimitExceeded(new chevre.factory.errors.RateLimitExceeded(message));
             },
             // スコープ生成ロジックをカスタマイズ
             scopeGenerator: () => rateLimitScope

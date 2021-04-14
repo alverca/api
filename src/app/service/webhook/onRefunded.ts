@@ -1,21 +1,21 @@
 /**
  * 返金イベント受信サービス
  */
-import * as alverca from '@chevre/domain';
+import * as chevre from '@chevre/domain';
 import * as cinerinoapi from '@cinerino/sdk';
 import * as moment from 'moment-timezone';
 
 import { createOrderReport } from '../report/order';
 
-export function onRefunded(params: alverca.factory.action.trade.refund.IAction) {
+export function onRefunded(params: chevre.factory.action.trade.refund.IAction) {
     return async (repos: {
-        accountingReport: alverca.repository.AccountingReport;
-        order: alverca.repository.Order;
-        report: alverca.repository.Report;
+        accountingReport: chevre.repository.AccountingReport;
+        order: chevre.repository.Order;
+        report: chevre.repository.Report;
     }): Promise<void> => {
         switch (params.purpose.typeOf) {
             // 返品手数料決済であれば
-            case alverca.factory.actionType.ReturnAction:
+            case chevre.factory.actionType.ReturnAction:
                 await onOrderRefunded(params)(repos);
                 break;
 
@@ -24,11 +24,11 @@ export function onRefunded(params: alverca.factory.action.trade.refund.IAction) 
     };
 }
 
-function onOrderRefunded(params: alverca.factory.action.trade.refund.IAction) {
+function onOrderRefunded(params: chevre.factory.action.trade.refund.IAction) {
     return async (repos: {
-        accountingReport: alverca.repository.AccountingReport;
-        order: alverca.repository.Order;
-        report: alverca.repository.Report;
+        accountingReport: chevre.repository.AccountingReport;
+        order: chevre.repository.Order;
+        report: chevre.repository.Report;
     }): Promise<void> => {
         // 注文を取得して、売上レポートに連携
         const orderNumber = (<any>params).purpose?.object?.orderNumber;

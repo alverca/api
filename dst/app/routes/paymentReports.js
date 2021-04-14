@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 決済レポートルーター
  */
-const alverca = require("@chevre/domain");
+const chevre = require("@chevre/domain");
 const express_1 = require("express");
 const express_validator_1 = require("express-validator");
 const mongoose = require("mongoose");
@@ -55,7 +55,7 @@ paymentReportsRouter.get('', permitScopes_1.default(['admin']), ...[
         // tslint:disable-next-line:no-magic-numbers
         const limit = (typeof ((_a = req.query) === null || _a === void 0 ? void 0 : _a.limit) === 'number') ? Math.min(req.query.limit, 100) : 100;
         const page = (typeof ((_b = req.query) === null || _b === void 0 ? void 0 : _b.page) === 'number') ? Math.max(req.query.page, 1) : 1;
-        const orderRepo = new alverca.repository.Order(mongoose.connection);
+        const orderRepo = new chevre.repository.Order(mongoose.connection);
         const unwindAcceptedOffers = req.query.$unwindAcceptedOffers === '1';
         const matchStages = request2matchStages(req);
         const aggregate = orderRepo.orderModel.aggregate([

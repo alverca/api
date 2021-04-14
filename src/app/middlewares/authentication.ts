@@ -1,7 +1,7 @@
 /**
  * 認証ミドルウェア
  */
-import * as alverca from '@chevre/domain';
+import * as chevre from '@chevre/domain';
 import * as cinerinoapi from '@cinerino/sdk';
 
 import { cognitoAuth } from '@motionpicture/express-middleware';
@@ -68,10 +68,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
                 next();
             },
             unauthorizedHandler: (err) => {
-                next(new alverca.factory.errors.Unauthorized(err.message));
+                next(new chevre.factory.errors.Unauthorized(err.message));
             }
         })(req, res, next);
     } catch (error) {
-        next(new alverca.factory.errors.Unauthorized(error.message));
+        next(new chevre.factory.errors.Unauthorized(error.message));
     }
 };

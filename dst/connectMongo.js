@@ -15,7 +15,7 @@ exports.connectMongo = void 0;
  */
 const createDebug = require("debug");
 const mongoose = require("mongoose");
-const debug = createDebug('@alverca/api:connectMongo');
+const debug = createDebug('@chevre/api:connectMongo');
 const PING_INTERVAL = 10000;
 const MONGOLAB_URI = process.env.MONGOLAB_URI;
 const connectOptions = {

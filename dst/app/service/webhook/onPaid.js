@@ -13,7 +13,7 @@ exports.onPaid = void 0;
 /**
  * 決済イベント受信サービス
  */
-const alverca = require("@chevre/domain");
+const chevre = require("@chevre/domain");
 const cinerinoapi = require("@cinerino/sdk");
 const moment = require("moment-timezone");
 const order_1 = require("../report/order");
@@ -21,7 +21,7 @@ function onPaid(params) {
     return (repos) => __awaiter(this, void 0, void 0, function* () {
         switch (params.purpose.typeOf) {
             // 返品手数料決済であれば
-            case alverca.factory.actionType.ReturnAction:
+            case chevre.factory.actionType.ReturnAction:
                 yield onReturnFeePaid(params)(repos);
                 break;
             // 注文決済であれば
@@ -42,7 +42,7 @@ function onReturnFeePaid(params) {
         }
         // 注文番号で注文決済行を取得
         const reservedReport = yield repos.report.aggregateSaleModel.findOne({
-            category: alverca.factory.report.order.ReportCategory.Reserved,
+            category: chevre.factory.report.order.ReportCategory.Reserved,
             'mainEntity.orderNumber': {
                 $exists: true,
                 $eq: orderNumber
@@ -64,7 +64,7 @@ function onReturnFeePaid(params) {
         const sortBy = reservedReport.sortBy.replace(':00:', ':02:');
         const dateRecorded = moment(params.startDate)
             .toDate();
-        const report = Object.assign(Object.assign({}, reservedReport), { amount, category: alverca.factory.report.order.ReportCategory.CancellationFee, dateRecorded,
+        const report = Object.assign(Object.assign({}, reservedReport), { amount, category: chevre.factory.report.order.ReportCategory.CancellationFee, dateRecorded,
             sortBy });
         if (typeof report.payment_seat_index === 'number') {
             delete report.payment_seat_index;

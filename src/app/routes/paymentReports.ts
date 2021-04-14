@@ -1,7 +1,7 @@
 /**
  * 決済レポートルーター
  */
-import * as alverca from '@chevre/domain';
+import * as chevre from '@chevre/domain';
 
 import { Request, Router } from 'express';
 import { query } from 'express-validator';
@@ -52,7 +52,7 @@ paymentReportsRouter.get(
             const limit = (typeof req.query?.limit === 'number') ? Math.min(req.query.limit, 100) : 100;
             const page = (typeof req.query?.page === 'number') ? Math.max(req.query.page, 1) : 1;
 
-            const orderRepo = new alverca.repository.Order(mongoose.connection);
+            const orderRepo = new chevre.repository.Order(mongoose.connection);
 
             const unwindAcceptedOffers = req.query.$unwindAcceptedOffers === '1';
             const matchStages = request2matchStages(req);

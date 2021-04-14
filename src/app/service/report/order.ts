@@ -1,13 +1,13 @@
 /**
  * 売上レポートサービス
  */
-import * as alverca from '@chevre/domain';
+import * as chevre from '@chevre/domain';
 import * as cinerinoapi from '@cinerino/sdk';
 import * as moment from 'moment-timezone';
 import * as util from 'util';
 
 export import PriceSpecificationType = cinerinoapi.factory.chevre.priceSpecificationType;
-export type ICompoundPriceSpecification = alverca.factory.compoundPriceSpecification.IPriceSpecification<PriceSpecificationType>;
+export type ICompoundPriceSpecification = chevre.factory.compoundPriceSpecification.IPriceSpecification<PriceSpecificationType>;
 
 /**
  * 注文アイテムから単価を取得する
@@ -67,8 +67,8 @@ function getSortBy(order: cinerinoapi.factory.order.IOrder, orderItem: cinerinoa
 export function createOrderReport(params: {
     order: cinerinoapi.factory.order.IOrder;
 }) {
-    return async (repos: { report: alverca.repository.Report }): Promise<void> => {
-        let datas: alverca.factory.report.order.IReport[] = [];
+    return async (repos: { report: chevre.repository.Report }): Promise<void> => {
+        let datas: chevre.factory.report.order.IReport[] = [];
 
         switch (params.order.orderStatus) {
             case cinerinoapi.factory.orderStatus.OrderProcessing:
@@ -78,7 +78,7 @@ export function createOrderReport(params: {
                         const unitPrice = getUnitPriceByAcceptedOffer(o);
 
                         return orderItem2report({
-                            category: alverca.factory.report.order.ReportCategory.Reserved,
+                            category: chevre.factory.report.order.ReportCategory.Reserved,
                             item: o.itemOffered,
                             unitPrice: unitPrice,
                             order: params.order,
@@ -97,7 +97,7 @@ export function createOrderReport(params: {
                         const unitPrice = getUnitPriceByAcceptedOffer(o);
 
                         return orderItem2report({
-                            category: alverca.factory.report.order.ReportCategory.Cancelled,
+                            category: chevre.factory.report.order.ReportCategory.Cancelled,
                             item: o.itemOffered,
                             unitPrice: unitPrice,
                             order: params.order,
@@ -123,13 +123,13 @@ export function createOrderReport(params: {
  */
 // tslint:disable-next-line:cyclomatic-complexity max-func-body-length
 function orderItem2report(params: {
-    category: alverca.factory.report.order.ReportCategory.Cancelled | alverca.factory.report.order.ReportCategory.Reserved;
+    category: chevre.factory.report.order.ReportCategory.Cancelled | chevre.factory.report.order.ReportCategory.Reserved;
     item: cinerinoapi.factory.order.IItemOffered;
     unitPrice: number;
     order: cinerinoapi.factory.order.IOrder;
     paymentSeatIndex?: number;
     salesDate: Date;
-}): alverca.factory.report.order.IReport {
+}): chevre.factory.report.order.IReport {
     const order = params.order;
 
     const age = (typeof order.customer.age === 'string') ? order.customer.age : '';
@@ -162,7 +162,7 @@ function orderItem2report(params: {
     const customerGroup: string = order2customerGroup(order);
     const amount: number = Number(order.price);
 
-    const customer: alverca.factory.report.order.ICustomer = {
+    const customer: chevre.factory.report.order.ICustomer = {
         group: customerGroup2reportString({ group: customerGroup }),
         givenName: (typeof order.customer.givenName === 'string') ? order.customer.givenName : '',
         familyName: (typeof order.customer.familyName === 'string') ? order.customer.familyName : '',
@@ -174,7 +174,7 @@ function orderItem2report(params: {
 
     const paymentMethod: string = paymentMethodName2reportString({ name: paymentMethodName });
 
-    const mainEntity: alverca.factory.report.order.IMainEntity = {
+    const mainEntity: chevre.factory.report.order.IMainEntity = {
         confirmationNumber: order.confirmationNumber,
         customer: customer,
         orderDate: moment(order.orderDate)
@@ -187,7 +187,7 @@ function orderItem2report(params: {
 
     let csvCode = '';
     let seatNumber: string | undefined;
-    let reservation: alverca.factory.report.order.IReservation = {
+    let reservation: chevre.factory.report.order.IReservation = {
         id: '',
         reservationFor: {
             id: '',
@@ -231,11 +231,11 @@ function orderItem2report(params: {
 
     let sortBy: string;
     switch (params.category) {
-        case alverca.factory.report.order.ReportCategory.Cancelled:
+        case chevre.factory.report.order.ReportCategory.Cancelled:
             sortBy = getSortBy(params.order, params.item, '01');
             break;
 
-        case alverca.factory.report.order.ReportCategory.Reserved:
+        case chevre.factory.report.order.ReportCategory.Reserved:
             sortBy = getSortBy(params.order, params.item, '00');
             break;
 

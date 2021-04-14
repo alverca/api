@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 404ハンドラーミドルウェア
  */
-const alverca = require("@chevre/domain");
+const chevre = require("@chevre/domain");
 exports.default = (req, __, next) => {
-    next(new alverca.factory.errors.NotFound(`router for [${req.originalUrl}]`));
+    next(new chevre.factory.errors.NotFound(`router for [${req.originalUrl}]`));
 };

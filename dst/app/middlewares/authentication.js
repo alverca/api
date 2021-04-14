@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 認証ミドルウェア
  */
-const alverca = require("@chevre/domain");
+const chevre = require("@chevre/domain");
 const cinerinoapi = require("@cinerino/sdk");
 const express_middleware_1 = require("@motionpicture/express-middleware");
 // 許可発行者リスト
@@ -73,11 +73,11 @@ exports.default = (req, res, next) => __awaiter(void 0, void 0, void 0, function
                 next();
             }),
             unauthorizedHandler: (err) => {
-                next(new alverca.factory.errors.Unauthorized(err.message));
+                next(new chevre.factory.errors.Unauthorized(err.message));
             }
         })(req, res, next);
     }
     catch (error) {
-        next(new alverca.factory.errors.Unauthorized(error.message));
+        next(new chevre.factory.errors.Unauthorized(error.message));
     }
 });

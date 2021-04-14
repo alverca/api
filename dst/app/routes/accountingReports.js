@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * 経理レポートルーター
  */
-const alverca = require("@chevre/domain");
+const chevre = require("@chevre/domain");
 const express_1 = require("express");
 const express_validator_1 = require("express-validator");
 const mongoose = require("mongoose");
@@ -53,7 +53,7 @@ accountingReportsRouter.get('', permitScopes_1.default(['admin']), ...[
         // tslint:disable-next-line:no-magic-numbers
         const limit = (typeof ((_a = req.query) === null || _a === void 0 ? void 0 : _a.limit) === 'number') ? Math.min(req.query.limit, 100) : 100;
         const page = (typeof ((_b = req.query) === null || _b === void 0 ? void 0 : _b.page) === 'number') ? Math.max(req.query.page, 1) : 1;
-        const reportRepo = new alverca.repository.AccountingReport(mongoose.connection);
+        const reportRepo = new chevre.repository.AccountingReport(mongoose.connection);
         const unwindAcceptedOffers = req.query.$unwindAcceptedOffers === '1';
         const matchStages = request2matchStages(req);
         const aggregate = reportRepo.accountingReportModel.aggregate([
