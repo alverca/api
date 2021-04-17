@@ -21,6 +21,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Removed
 
+- 売上レポートストリーミング検索を削除
+
 ### Fixed
 
 ### Security
